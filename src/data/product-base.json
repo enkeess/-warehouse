@@ -1,0 +1,98 @@
+{
+	"products": [
+		{
+			"title": "Молоко",
+			"initialPrice": 99,
+			"expiryDate": 5
+		},
+
+		{
+			"title": "Хлеб",
+			"initialPrice": 25,
+			"expiryDate": 2
+		},
+
+		{
+			"title": "Сыр",
+			"initialPrice": 300,
+			"expiryDate": 7
+		},
+
+		{
+			"title": "Яйца",
+			"initialPrice": 59,
+			"expiryDate": 3
+		}
+	],
+
+	"limits": [
+		{
+			"title": "Молоко",
+			"limit": 100
+		},
+
+		{
+			"title": "Сыр",
+			"limit": 20
+		},
+
+		{
+			"title": "Яйца",
+			"limit": 50
+		},
+
+		{
+			"title": "Хлеб",
+			"limit": 30
+		},
+
+		{
+			"title": "default",
+			"limit": 50
+		}
+	],
+
+	"initialStore": [
+		{
+			"title": "Молоко",
+			"amount": 30
+		},
+
+		{
+			"title": "Хлеб",
+			"amount": 20
+		},
+
+		{
+			"title": "Яйца",
+			"amount": 20
+		}
+	],
+
+	"productId": [
+		{
+			"title":"default",
+			"id": 200
+		},
+
+		{
+			"title":"Молоко",
+			"id": 201
+		},
+
+		{
+			"title":"Хлеб",
+			"id": 202
+		},
+
+		{
+			"title":"Сыр",
+			"id": 203
+		},
+
+		{
+			"title":"Яйца",
+			"id": 204
+		}
+	]
+}

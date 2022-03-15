@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
+	<link rel="manifest" href="./favicon/site.webmanifest">
+	<link rel="mask-icon" href="./favicon/safari-pinned-tab.svg" color="#5bbad5">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="theme-color" content="#ffffff">
+
+    <title>Склад</title>
+    <link rel="stylesheet" href="./css/style.min.css">
+</head>
+
+<body class="main__body">
+    <!-- Header -->
+    
+
+    <!-- Main Page -->
+    <main> 
+
+
+		<h1>Склад</h1>
+
+		<div class="preset">
+			<div class="block">
+				<h2>Настройка параметров моделирования</h2>
+				<label>
+					Кол-во торговых точек
+					<select>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+					</select>
+				</label>
+				
+				<label>
+					Кол-во продуктовых товаров
+					<select>
+						<option value="12">12</option>
+						<option value="13">13</option>
+						<option value="14">14</option>
+						<option value="15">15</option>
+						<option value="16">16</option>
+						<option value="17">17</option>
+						<option value="18">18</option>
+						<option value="19">19</option>
+						<option value="20">20</option>
+					</select>
+				</label>
+
+				<label>
+					Кол-во дней моделирования
+					<select>
+						<option value="10">10</option>
+						<option value="11">11</option>
+						<option value="12">12</option>
+						<option value="13">13</option>
+						<option value="14">14</option>
+						<option value="15">15</option>
+						<option value="16">16</option>
+						<option value="17">17</option>
+						<option value="18">18</option>
+						<option value="19">19</option>
+						<option value="20">20</option>
+						<option value="21">21</option>
+						<option value="22">22</option>
+						<option value="23">23</option>
+						<option value="24">24</option>
+						<option value="25">25</option>
+						<option value="26">26</option>
+						<option value="27">27</option>
+						<option value="28">28</option>
+						<option value="29">29</option>
+						<option value="30">30</option>
+					</select>
+				</label>
+
+			</div>
+		</div>
+
+
+		<div class="test">
+			<div class="flex">
+				<div class="block">
+					<h2>Товары на складе</h2>
+					<div id="warehouse" class="table">
+						<div class="table__line table__top ">
+							<span>Код товара</span>
+							<span>Кол-во единиц</span>
+							<span>Срок годности (дней) </span>
+							<span>Закупочная цена за единицу (у.е)</span>
+							<span>Базовая наценка (%)</span>
+							<span>Наценка с учетом уценки (%)</span>
+							<span>Цена за единицу (у.е)</span>
+						</div>
+					
+						<ul id="warehouse-list" class="table__list">
+					
+						</ul>
+					</div>
+				</div>
+
+				<div class="block">
+					<h2>Ожидаемые поставки</h2>
+					<div id="expected" class="table">
+						<div class="table__line table__top ">
+							<span>Код товара</span>
+							<span>Кол-во единиц</span>
+						</div>
+
+						<ul id="expected-list" class="table__list">
+
+						</ul>
+					</div>
+				</div>
+			</div>
+			
+
+			<div class="flex">
+				<div class="block">
+					<h2>Список заказов от торговых точек</h2>
+					<div id="orders" class="table">
+						<div class="table__line table__top ">
+							<span>Код товара</span>
+							<span>Торговая точка</span>
+							<span>Кол-во единиц</span>
+						</div>
+					
+						<ul id="orders-list" class="table__list">
+					
+						</ul>
+					</div>
+				</div>
+
+				<div class="block">
+					<h2>Сформированный список перевозок</h2>
+					<div id="departures" class="table">
+						<div class="table__line table__top ">
+							<span>Код товара</span>
+							<span>Торговая точка</span>
+							<span>Кол-во единиц</span>
+							<span>Цена за единицу (у.е)</span>
+						</div>
+				
+						<ul id="departures-list" class="table__list">
+				
+						</ul>
+					</div>
+				</div>
+
+				<div class="block">
+					<h2>Статистика</h2>
+
+					<ul id="statistic" class="statistic" >
+						<li class="statistic__item">
+							<span>Объем продаж за день: </span>
+							<span id="volume">100</span>
+						</li>
+
+						<li class="statistic__item">
+							<span>Чистая прибыль за день: </span>
+							<span class="" id="profitDay">100</span>
+						</li>
+
+						<li class="statistic__item">
+							<span>Потери при списании: </span>
+							<span class="" id="losses">10000</span>
+						</li>
+
+						<li class="statistic__item">
+							<span>Чистая прибыль за все дни:</span>
+							<span class="" id="profitAll">100</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+			
+			<div class="manage-panel">	
+				<div class="counter">1 / 10</div>
+				<button id="next" class="btn next">Следующий день</button>
+			</div>
+
+		</div>
+	</main>
+
+    <!-- Footer -->
+    
+
+</body>
+
+<script type="module" src="./js/scripts.js"></script>
+<!-- <script src="./js/main.js"></script> -->
+
+</html>

@@ -1,0 +1,156 @@
+// Global SCSS-files imports
+@import "./vars";
+@import "./reset";
+@import "./global";
+
+// Sections or Pages SCSS-files imports
+
+body {
+  padding: 10px;
+  position: relative;
+  padding-bottom: 80px;
+}
+
+// .test {
+// //   display: none;
+// }
+
+.flex {
+  display: flex;
+}
+
+.manage-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background-color: #18aaaa;
+  padding: 5px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.btn {
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.counter {
+  padding: 10px;
+  font-size: 20px;
+}
+
+h1 {
+  margin: 20px 0;
+  text-align: center;
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.table {
+  border: solid 1px black;
+  max-height: 225px;
+  overflow-y: scroll;
+  position: relative;
+  margin-bottom: 20px;
+  width: max-content;
+  &__line {
+    display: flex;
+  }
+
+  &__top,
+  &__item {
+    span {
+      width: 10vw;
+      padding: 5px;
+      border-right: solid 1px black;
+      border-bottom: solid 1px black;
+    }
+  }
+
+  &__top {
+    height: 65px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    span {
+      font-weight: 500;
+      background-color: #e7e7e7;
+    }
+  }
+
+  &__item:last-child {
+    span {
+      border-bottom: none;
+    }
+  }
+}
+
+.table {
+  position: relative;
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #18aaaa;
+    background-color: #f9f9fd;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+    background: #e7e7e7;
+  }
+}
+
+.block {
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+  border: solid 1px black;
+}
+
+.statistic {
+  width: 17vw;
+  //   margin-top: 30px;
+
+  &__item {
+    font-size: 14px;
+    // padding: 15px 10px;
+    align-items: center;
+    border: solid 1px gray;
+    border-bottom: none;
+    display: grid;
+    grid-template-columns: 1fr 60px;
+    &:last-child {
+      border: solid 1px gray;
+    }
+    span {
+      padding: 15px 10px;
+      &:first-child {
+        background-color: #e7e7e7;
+      }
+      &:nth-child(2) {
+        text-align: center;
+        position: relative;
+        &::before {
+          content: "";
+          position: absolute;
+          height: 100%;
+          width: 1px;
+          background: gray;
+          top: 0;
+          left: 0;
+        }
+      }
+    }
+  }
+}
