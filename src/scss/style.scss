@@ -62,6 +62,7 @@ h2 {
   position: relative;
   margin-bottom: 20px;
   width: max-content;
+
   &__line {
     display: flex;
   }
@@ -116,15 +117,14 @@ h2 {
   margin: 10px;
   border-radius: 10px;
   border: solid 1px black;
+  width: fit-content;
 }
 
 .statistic {
   width: 17vw;
-  //   margin-top: 30px;
 
   &__item {
     font-size: 14px;
-    // padding: 15px 10px;
     align-items: center;
     border: solid 1px gray;
     border-bottom: none;
@@ -157,4 +157,41 @@ h2 {
 
 .hide {
   display: none;
+}
+
+h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.table_tr {
+  display: flex;
+  flex-direction: row;
+  overflow-y: initial;
+  height: max-content;
+  .table__top {
+    position: inherit;
+    height: auto;
+  }
+  .table__line {
+    flex-direction: column;
+    // align-items: center;
+    // justify-content: center;
+    span {
+      width: 8vw;
+      height: 60px;
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+    &:last-child {
+      span {
+        border-right: none;
+        border-bottom: solid 1px black;
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
 }

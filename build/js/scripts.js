@@ -31,11 +31,7 @@ const warehouseList = document.querySelector('#warehouse-list');
 const ordersList = document.querySelector('#orders-list');
 const departuresList = document.querySelector('#departures-list');
 const expectedList = document.querySelector('#expected-list');
-
-const volume = document.querySelector('#volume');
-const profitDay = document.querySelector('#profitDay');
-const losses = document.querySelector('#losses');
-const profitAll = document.querySelector('#profitAll');
+const statList = document.querySelector('#stat-list');
 
 const history = document.querySelector('#history');
 const historyBlock = document.querySelector('.history__block');
@@ -62,6 +58,8 @@ clearUI(history);
 const drawTable = (parent, data) => {
 	clearUI(parent);
 
+	console.log(data);
+
 	let tableRows = data.map((node) => {
 		let tableRow = document.createElement('li');
 		tableRow.classList.add('table__line', 'table__item');
@@ -87,11 +85,8 @@ const updateUI = (store) => {
 	drawTable(departuresList, store.getDepartures());
 	drawTable(expectedList, store.getExpectedDeliveries());
 
-	// statistic
-	drawSpan(volume, store.getVolume());
-	drawSpan(profitDay, store.getProfitDay());
-	drawSpan(losses, store.getLosses());
-	drawSpan(profitAll, store.getProfitAll());
+	drawTable(statList, store.getShortStat());
+
 }
 
 const updateCounter = (curDay, days) => {
@@ -104,18 +99,22 @@ const drawHistory = (historyData) => {
 	clearUI(history);
 	const historyList = document.createElement('ul');
 	historyList.classList.add('history__list', 'table__list');
+	const historyItemWrapper = document.createElement('div');
+	historyItemWrapper.classList.add('flex');
 
 	historyData.forEach(item => {
 		console.log(item);
 		let newHistoryBlock = historyBlock.cloneNode();
 		let newHistoryItem = historyItem.cloneNode(true);
 		let newHistoryList = historyList.cloneNode();
+		let newHistoryItemWrapper = historyItemWrapper.cloneNode();
 		const newHistoryTitle = historyTitle.cloneNode();
 		newHistoryTitle.innerText = `День ${item.day}`;
 		drawTable(newHistoryList, item.stat);
 		newHistoryItem.append(newHistoryList);
+		newHistoryItemWrapper.append(newHistoryItem);
 		newHistoryBlock.append(newHistoryTitle);
-		newHistoryBlock.append(newHistoryItem);
+		newHistoryBlock.append(newHistoryItemWrapper);
 		history.append(newHistoryBlock);
 	})
 };
@@ -199,17 +198,18 @@ function StatisticItem(id) {
 	// id;               // код товара
 	// orderAmount;      // объем заявок на поставки
 	// departuresAmount; // объем отгруженных заявок
+	// lossesAmount;     // объем списанных товаров
 	// totalCost;        // общая стоимость проданных товаров
 	// profitCost;       // чистая прибыль от продажи товаров
 	// totalLosses;      // общая потеря от списывания
 	
-		this.id = id;
-		this.orderAmount = 0;
-		this.departuresAmount = 0;
-		this.totalCost = 0;
-		this.profitCost = 0;
-		this.totalLosses = 0;
-	
+	this.id = id;
+	this.orderAmount = 0;
+	this.departuresAmount = 0;
+	this.lossesAmount = 0;
+	this.totalCost = 0;
+	this.profitCost = 0;
+	this.totalLosses = 0;
 }
 
 class Store { // склад
@@ -230,8 +230,6 @@ class Store { // склад
 	#morningStatisticList = [];
 
 	
-
-
 	constructor(db, provider) {
 		this.#productsBase = new ProductsBase(db.products);
 		this.#config = db.config;
@@ -318,6 +316,16 @@ class Store { // склад
 
 	getStatistic = () => this.#morningStatisticList;
 
+	getShortStat = () => {
+		return(
+			[{
+				volume: this.#morningStatisticList.reduce((res, {totalCost}) => res + totalCost, 0),
+				profit: this.#morningStatisticList.reduce((res, {profitCost}) => res + profitCost, 0),
+				losses: this.#morningStatisticList.reduce((res, {totalLosses}) => res + totalLosses, 0),
+			}]
+		)
+	}
+
 	#collectStatistic = () => {
 		this.#orderList.map(item => 
 			item.order.map(({id, amount}) => {
@@ -336,6 +344,7 @@ class Store { // склад
 		this.#products.filter(item => item.expiryDate == 0).map(({id, amount, initialPrice}) => {
 			let stat = this.#statisticList[id - 201];
 			stat.totalLosses = stat.totalLosses + amount * initialPrice;
+			stat.lossesAmount = stat.lossesAmount + amount;
 		})
 	}
 

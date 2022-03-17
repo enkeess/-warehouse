@@ -30,17 +30,18 @@ function StatisticItem(id) {
 	// id;               // код товара
 	// orderAmount;      // объем заявок на поставки
 	// departuresAmount; // объем отгруженных заявок
+	// lossesAmount;     // объем списанных товаров
 	// totalCost;        // общая стоимость проданных товаров
 	// profitCost;       // чистая прибыль от продажи товаров
 	// totalLosses;      // общая потеря от списывания
 	
-		this.id = id;
-		this.orderAmount = 0;
-		this.departuresAmount = 0;
-		this.totalCost = 0;
-		this.profitCost = 0;
-		this.totalLosses = 0;
-	
+	this.id = id;
+	this.orderAmount = 0;
+	this.departuresAmount = 0;
+	this.lossesAmount = 0;
+	this.totalCost = 0;
+	this.profitCost = 0;
+	this.totalLosses = 0;
 }
 
 class Store { // склад
@@ -61,8 +62,6 @@ class Store { // склад
 	#morningStatisticList = [];
 
 	
-
-
 	constructor(db, provider) {
 		this.#productsBase = new ProductsBase(db.products);
 		this.#config = db.config;
@@ -149,6 +148,16 @@ class Store { // склад
 
 	getStatistic = () => this.#morningStatisticList;
 
+	getShortStat = () => {
+		return(
+			[{
+				volume: this.#morningStatisticList.reduce((res, {totalCost}) => res + totalCost, 0),
+				profit: this.#morningStatisticList.reduce((res, {profitCost}) => res + profitCost, 0),
+				losses: this.#morningStatisticList.reduce((res, {totalLosses}) => res + totalLosses, 0),
+			}]
+		)
+	}
+
 	#collectStatistic = () => {
 		this.#orderList.map(item => 
 			item.order.map(({id, amount}) => {
@@ -167,6 +176,7 @@ class Store { // склад
 		this.#products.filter(item => item.expiryDate == 0).map(({id, amount, initialPrice}) => {
 			let stat = this.#statisticList[id - 201];
 			stat.totalLosses = stat.totalLosses + amount * initialPrice;
+			stat.lossesAmount = stat.lossesAmount + amount;
 		})
 	}
 

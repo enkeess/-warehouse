@@ -19,13 +19,8 @@
 </head>
 
 <body class="main__body">
-    <!-- Header -->
-    
 
-    <!-- Main Page -->
     <main> 
-
-
 		<h1>Склад</h1>
 
 		<div class="setup">
@@ -91,11 +86,11 @@
 					Файл конфигурации:
 					<input name="config" type="file"></input>
 				</label>
-				<button id="start" class="btn"> Запустить моделирование </button>
+				<button id="start" class="btn"> Начать новый эксперимент </button>
 			</form>
 		</div>
 
-		<div id="experiment">
+		<div id="experiment" class="hide">
 			<div class="flex">
 				<div class="block">
 					<h2>Товары на складе</h2>
@@ -167,27 +162,20 @@
 				<div class="block">
 					<h2>Статистика</h2>
 
-					<ul id="statistic" class="statistic" >
-						<li class="statistic__item">
+					<div class="table table_tr">
+						<div class="table__top table__line">
 							<span>Объем продаж за день: </span>
-							<span id="volume">0</span>
-						</li>
-
-						<li class="statistic__item">
 							<span>Чистая прибыль за день: </span>
-							<span class="" id="profitDay">0</span>
-						</li>
-
-						<li class="statistic__item">
 							<span>Потери при списании: </span>
-							<span class="" id="losses">0</span>
-						</li>
+							<!-- <span>Чистая прибыль за все дни:</span> -->
+						</div>
 
-						<li class="statistic__item">
-							<span>Чистая прибыль за все дни:</span>
-							<span class="" id="profitAll">0</span>
-						</li>
-					</ul>
+						<ul id="stat-list" class="table__list">
+						
+						</ul>
+					</div>
+
+					
 				</div>
 			</div>
 			<div class="manage-panel">
@@ -202,16 +190,17 @@
 		</div>
 
 		<div class="hide" id="results">
-			<h2>Подбробная статистика эксперимента</h2>
+			<h2>Подбробная статистика эксперимента по дням</h2>
 			<div id="history">
 				<div class="history__block block">
 					<h3 class="history__title">День</h3>
-				
+					
 					<div class="history__item table">
 						<div class="table__line table__top ">
 							<span>Код товара</span>
 							<span>Объем заявок</span>
 							<span>Объем отгруженных</span>
+							<span>Списано</span>
 							<span>Общая стоимость</span>
 							<span>Чистая прибыль </span>
 							<span>Потери от списания</span>
@@ -221,7 +210,8 @@
 
 						</ul> -->
 					</div>
-
+					
+					
 				</div>
 			</div>
 		</div>
@@ -250,6 +240,23 @@
 
 		}
 	</script> -->
+
+	<!-- <ul class="table table_tr">
+		<li class="table__top table__line">
+			<span>Объем продаж за день: </span>
+			<span>Объем продаж за день: </span>
+			<span>Объем продаж за день: </span>
+		</li>
+
+		<li class="table__line table__item">
+			<span>10</span>
+			<span>15</span>
+			<span>45244</span>
+		</li>
+		
+		
+	</ul> -->
+
 </body>
 
 <script type="module" src="./js/scripts.js"></script>

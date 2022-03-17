@@ -214,6 +214,9 @@ h2 {
   margin: 10px;
   border-radius: 10px;
   border: solid 1px black;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
 }
 
 .statistic {
@@ -260,6 +263,55 @@ h2 {
 
 .hide {
   display: none;
+}
+
+h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.table_tr {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  overflow-y: initial;
+  height: -webkit-max-content;
+  height: -moz-max-content;
+  height: max-content;
+}
+
+.table_tr .table__top {
+  position: inherit;
+  height: auto;
+}
+
+.table_tr .table__line {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.table_tr .table__line span {
+  width: 8vw;
+  height: 60px;
+}
+
+.table_tr .table__line span:last-child {
+  border-bottom: none;
+}
+
+.table_tr .table__line:last-child span {
+  border-right: none;
+  border-bottom: solid 1px black;
+}
+
+.table_tr .table__line:last-child span:last-child {
+  border-bottom: none;
 }
 
 @media (max-width: 1449.98px) {
