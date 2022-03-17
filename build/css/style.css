@@ -152,7 +152,7 @@ h2 {
 
 .table {
   border: solid 1px black;
-  max-height: 225px;
+  max-height: 200px;
   overflow-y: scroll;
   position: relative;
   margin-bottom: 20px;
@@ -256,6 +256,10 @@ h2 {
   background: gray;
   top: 0;
   left: 0;
+}
+
+.hide {
+  display: none;
 }
 
 @media (max-width: 1449.98px) {

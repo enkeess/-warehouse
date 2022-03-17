@@ -1,43 +1,8 @@
-
-class Tester {
-	#store = new Store(db);
-	#currentDay = 1;
-	#days = 30;
-
-	#hystory; // объект который хранит состояние стейта стора по дням
-
-	#relailers = [
-		new Retailer({provider: this.#store, id: 100}),
-		new Retailer({provider: this.#store, id: 101}),
-		new Retailer({provider: this.#store, id: 102}),
-		new Retailer({provider: this.#store, id: 103}),
-	]
-
-	getStore = () => this.#store;
-	getCurrentDay = () => this.#currentDay;
-	
-	prevStep = () => {
-		if(this.#currentDay > 1) {
-			this.#currentDay = this.#currentDay - 1;
-			this.#updateData();
-		}
-	}
-
-	nextStep = () => {
-		if(this.#currentDay < this.#days) {
-			this.#currentDay = this.#currentDay + 1;
-			this.#updateData();
-		}
-	}
-
-	#updateData = () => console.log('update data');
-}
-
 // переписать класс на основе main.js 
 
 // добавить генерацию ордеров для ритейлеров
 
-class Tester1 {
+class Tester {
 
 	#store; // экземпляр класса склада
 	#provider = new Provider(); // фирма поставщик
@@ -51,15 +16,27 @@ class Tester1 {
 	#retailersAmount; // кол-во торговых точек
 	#productsAmount;  // кол-во видов продуктов
 
+	#history = [];
+
 	constructor(db, days, retailersAmount, productsAmount) {
-		this.#db = db;
+		const newDb = {
+			products: db.products.filter(item => item.id <= 200 + productsAmount),
+			config: db.config.filter(item => item.id <= 200 + productsAmount),
+			initialStore: db.initialStore.filter(item => item.id <= 200 + productsAmount)
+		}
+
+		this.#db = newDb;
 		this.#store = new Store(this.#db, this.#provider);
 		this.#days = days;
 		this.#retailersAmount = retailersAmount; 
 		this.#productsAmount = productsAmount;
 		this.#currentDay = 0;
+		this.#history = [];
 		this.#retailers = new Array(retailersAmount).fill(0).map((item, i) => new Retailer({provider:this.#store, id: 101 + i}));
+		
+		nextBtn.classList.remove('hide');
 		updateUI(this.#store);
+		this.nextStep();
 	}
 
 	getRetailers = () => this.#retailers;
@@ -69,7 +46,15 @@ class Tester1 {
 		this.#provider.sendOrder(this.#store);
 		this.#store.newDay();
 		this.#currentDay = this.#currentDay + 1;
+
+		this.#history = [...this.#history, {day: this.#currentDay, stat: this.#store.getStatistic()}]
+			
 		updateUI(this.#store);
+		updateCounter(this.#currentDay, this.#days);
+		if(this.#currentDay == this.#days) {
+			nextBtn.classList.add('hide');
+			resultsBtn.classList.remove('hide')
+		}
 	}
 
 	#generateOrders = () => {
@@ -78,18 +63,14 @@ class Tester1 {
 			const orderList = getRandomArray(201, 200 + this.#productsAmount, getRandomInt(1, 5)).map(
 				id => new Order(id, getRandomInt(10, 30))
 			);
-			console.log('order-list: ')
-			console.log(orderList);
+
 			this.#retailers[index].makeOrder(orderList);
 		})
 	}
 	
-	// getCurrentDay = () => this.#currentDay;
 	getCurrentDay = () => this.#currentDay;
+
+	getHistory = () => this.#history;
 }
 
-
-// console.log(pop.getRetailers());
-
-// pop.generateOrders();
 

@@ -57,7 +57,7 @@ h2 {
 
 .table {
   border: solid 1px black;
-  max-height: 225px;
+  max-height: 200px;
   overflow-y: scroll;
   position: relative;
   margin-bottom: 20px;
@@ -153,4 +153,8 @@ h2 {
       }
     }
   }
+}
+
+.hide {
+  display: none;
 }

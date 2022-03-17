@@ -28,12 +28,12 @@
 
 		<h1>Склад</h1>
 
-		<div class="preset">
-			<div class="block">
+		<div class="setup">
+			<form id="form" class="block">
 				<h2>Настройка параметров моделирования</h2>
 				<label>
 					Кол-во торговых точек
-					<select>
+					<select id="retailersAmount" name="retailersAmount">
 						<option value="3">3</option>
 						<option value="4">4</option>
 						<option value="5">5</option>
@@ -46,7 +46,7 @@
 				
 				<label>
 					Кол-во продуктовых товаров
-					<select>
+					<select id="productsAmount" name="productsAmount">
 						<option value="12">12</option>
 						<option value="13">13</option>
 						<option value="14">14</option>
@@ -61,7 +61,8 @@
 
 				<label>
 					Кол-во дней моделирования
-					<select>
+					<select id="days" name="days">
+						<option value="1">1</option>
 						<option value="10">10</option>
 						<option value="11">11</option>
 						<option value="12">12</option>
@@ -86,11 +87,15 @@
 					</select>
 				</label>
 
-			</div>
+				<label>
+					Файл конфигурации:
+					<input name="config" type="file"></input>
+				</label>
+				<button id="start" class="btn"> Запустить моделирование </button>
+			</form>
 		</div>
 
-
-		<div class="test">
+		<div id="experiment">
 			<div class="flex">
 				<div class="block">
 					<h2>Товары на складе</h2>
@@ -165,38 +170,86 @@
 					<ul id="statistic" class="statistic" >
 						<li class="statistic__item">
 							<span>Объем продаж за день: </span>
-							<span id="volume">100</span>
+							<span id="volume">0</span>
 						</li>
 
 						<li class="statistic__item">
 							<span>Чистая прибыль за день: </span>
-							<span class="" id="profitDay">100</span>
+							<span class="" id="profitDay">0</span>
 						</li>
 
 						<li class="statistic__item">
 							<span>Потери при списании: </span>
-							<span class="" id="losses">10000</span>
+							<span class="" id="losses">0</span>
 						</li>
 
 						<li class="statistic__item">
 							<span>Чистая прибыль за все дни:</span>
-							<span class="" id="profitAll">100</span>
+							<span class="" id="profitAll">0</span>
 						</li>
 					</ul>
 				</div>
 			</div>
-			
-			<div class="manage-panel">	
-				<div class="counter">1 / 10</div>
+			<div class="manage-panel">
+				<div class="counter">
+					<span id="currentDay">0</span>
+					/
+					<span id="allDays">0</span>
+				</div>
 				<button id="next" class="btn next">Следующий день</button>
+				<button id="resultsBtn" class="btn hide"> Показать результаты эксперимента </button>
 			</div>
+		</div>
 
+		<div class="hide" id="results">
+			<h2>Подбробная статистика эксперимента</h2>
+			<div id="history">
+				<div class="history__block block">
+					<h3 class="history__title">День</h3>
+				
+					<div class="history__item table">
+						<div class="table__line table__top ">
+							<span>Код товара</span>
+							<span>Объем заявок</span>
+							<span>Объем отгруженных</span>
+							<span>Общая стоимость</span>
+							<span>Чистая прибыль </span>
+							<span>Потери от списания</span>
+						</div>
+
+						<!-- <ul class="history__list table__list">
+
+						</ul> -->
+					</div>
+
+				</div>
+			</div>
 		</div>
 	</main>
 
-    <!-- Footer -->
-    
+	<!-- <input type="file" onchange="readFile(this)">
+	
+	<script>
+		function readFile(input) {
+			let file = input.files[0];
 
+			let reader = new FileReader();
+
+			reader.readAsText(file);
+
+			reader.onload = function () {
+				console.log(reader.result);
+				const newBD = JSON.parse(reader.result);
+				console.log(newBD);
+
+			};
+
+			reader.onerror = function () {
+				console.log(reader.error);
+			};
+
+		}
+	</script> -->
 </body>
 
 <script type="module" src="./js/scripts.js"></script>
