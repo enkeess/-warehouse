@@ -28,24 +28,72 @@ const experiment = document.querySelector('#experiment');
 const results = document.querySelector('#results');
 
 const warehouseList = document.querySelector('#warehouse-list');
-const ordersList = document.querySelector('#orders-list');
-const departuresList = document.querySelector('#departures-list');
-const expectedList = document.querySelector('#expected-list');
-const statList = document.querySelector('#stat-list');
+const warehouseTopList = [
+	'Код товара',
+	'Кол-во единиц',
+	'Срок годности (дней) ',
+	'Закупочная цена за единицу (у.е)',
+	'Базовая наценка (%)',
+	'Наценка с учетом уценки (%)',
+	'Цена за единицу (у.е)'
+]
 
-const history = document.querySelector('#history');
+const scrappedList = document.querySelector('#scrapped-list')
+
+
+const ordersList = document.querySelector('#orders-list');
+const orderTopList = [
+	'Код товара',
+	'Торговая точка',
+	'Кол-во единиц'
+]
+
+const departuresList = document.querySelector('#departures-list');
+const departuresTopList = [
+	'Код товара',
+	'Торговая точка',
+	'Кол-во единиц',
+	'Цена за единицу (у.е)'
+]
+
+const expectedList = document.querySelector('#expected-list');
+const expectedTopList = [
+	'Код товара',
+	'Кол-во единиц'
+]
+
+const statList = document.querySelector('#stat-list');
+const statTopList = [
+	'Объем продаж',
+	'Чистая прибыль',
+	'Потери при списании',
+	'Итог'
+]
+
+const historyByDay = document.querySelector('#historyByDay');
+const historyResult = document.querySelector('#historyResult');
 const historyBlock = document.querySelector('.history__block');
 const historyTitle = document.querySelector('.history__title');
 const historyItem = document.querySelector('.history__item');
+const historyStat = document.querySelector('.history__stat');
+const historyWrapper = document.querySelector('.history__wrapper');
+
+const historyTopItem = [
+	'Код товара',
+	'Объем заявок',
+	'Объем отгруженных',
+	'Списано',
+	'Общая стоимость',
+	'Чистая прибыль ',
+	'Потери от списания'
+]
+
+
 
 const currentDay = document.querySelector('#currentDay');
 const allDays = document.querySelector('#allDays');
 
-history.append(historyItem.cloneNode(true));
 const form = document.querySelector('#form');
-
-
-
 
 const clearUI = (parent) => {
 	while (parent.firstChild) {
@@ -55,10 +103,21 @@ const clearUI = (parent) => {
 
 clearUI(history);
 
-const drawTable = (parent, data) => {
+
+const withSpan = (text) => {
+	const span = document.createElement('span');
+	span.innerText = text;
+	return span;
+}
+
+const drawTable = (parent, top, data) => {
 	clearUI(parent);
 
-	console.log(data);
+	let tableTop = document.createElement('li');
+	tableTop.classList.add('table__line', 'table__top');
+	top.map(item => tableTop.append(withSpan(item)));
+
+	parent.append(tableTop);
 
 	let tableRows = data.map((node) => {
 		let tableRow = document.createElement('li');
@@ -75,18 +134,13 @@ const drawTable = (parent, data) => {
 	tableRows.forEach(item => parent.append(item));
 }
 
-const drawSpan = (parent, data) => {
-	parent.innerText = data;
-}
-
 const updateUI = (store) => {
-	drawTable(ordersList, store.getOrderList());
-	drawTable(warehouseList, store.getProducts());
-	drawTable(departuresList, store.getDepartures());
-	drawTable(expectedList, store.getExpectedDeliveries());
-
-	drawTable(statList, store.getShortStat());
-
+	drawTable(ordersList, orderTopList, store.getOrderList());
+	drawTable(warehouseList, warehouseTopList, store.getProducts());
+	drawTable(scrappedList, warehouseTopList, store.getScrappedProducts());
+	drawTable(departuresList, departuresTopList, store.getDepartures());
+	drawTable(expectedList, expectedTopList, store.getExpectedDeliveries());
+	drawTable(statList, statTopList, store.getShortStat());
 }
 
 const updateCounter = (curDay, days) => {
@@ -95,27 +149,30 @@ const updateCounter = (curDay, days) => {
 }
 
 
-const drawHistory = (historyData) => {
-	clearUI(history);
-	const historyList = document.createElement('ul');
-	historyList.classList.add('history__list', 'table__list');
-	const historyItemWrapper = document.createElement('div');
-	historyItemWrapper.classList.add('flex');
+const drawHistory = (parent, data) => {
+	clearUI(parent);
 
-	historyData.forEach(item => {
+	data.forEach(item => {
 		console.log(item);
 		let newHistoryBlock = historyBlock.cloneNode();
-		let newHistoryItem = historyItem.cloneNode(true);
-		let newHistoryList = historyList.cloneNode();
-		let newHistoryItemWrapper = historyItemWrapper.cloneNode();
 		const newHistoryTitle = historyTitle.cloneNode();
-		newHistoryTitle.innerText = `День ${item.day}`;
-		drawTable(newHistoryList, item.stat);
-		newHistoryItem.append(newHistoryList);
-		newHistoryItemWrapper.append(newHistoryItem);
+		let newHistoryItem = historyItem.cloneNode();
+		let newHistoryStat = historyStat.cloneNode();
+
+		let newHistoryWrapper = historyWrapper.cloneNode();
+		
+		if(item.day) newHistoryTitle.innerText = `День ${item.day}`;
+
+		drawTable(newHistoryItem, historyTopItem, item.stat);
+		drawTable(newHistoryStat, statTopList, item.short);
+		
+		newHistoryWrapper.append(newHistoryItem);
+		newHistoryWrapper.append(newHistoryStat);
+		
 		newHistoryBlock.append(newHistoryTitle);
-		newHistoryBlock.append(newHistoryItemWrapper);
-		history.append(newHistoryBlock);
+		newHistoryBlock.append(newHistoryWrapper);
+
+		parent.append(newHistoryBlock);
 	})
 };
 
@@ -214,6 +271,7 @@ function StatisticItem(id) {
 
 class Store { // склад
 	#products;
+	#scrappedProducts;
 	#productsBase;
 	#config;
 	#profitFactor = 1.2; // наценка 
@@ -224,6 +282,7 @@ class Store { // склад
 	#losses;
 	#profitAll = 0;
 	#statisticList = [];
+	#result = [];
 
 	#morningPropucts;
 	#morningOrders;
@@ -248,8 +307,8 @@ class Store { // склад
 		this.#morningPropucts = this.#products;
 		this.#morningOrders = this.#orderList;
 		this.#statisticList = db.products.map(item => new StatisticItem(item.id));
-
-		console.log(this.#statisticList);
+		this.#result = db.products.map(item => new StatisticItem(item.id));
+		this.#scrappedProducts = [];
 	}
 
 	#orderList = []; // список заказов от точек
@@ -288,9 +347,7 @@ class Store { // склад
 		this.#profitDay = 0;
 
 		this.#statisticList = db.products.map(item => new StatisticItem(item.id));
-
-		console.log(this.#statisticList);
-
+		
 		this.#orderList.map(orderListItem => { // проходимся по списку заказов и отправляем все что можем
 			orderListItem.order.map(order => {
 				this.#tryStore(order, orderListItem.retailer.getId());
@@ -308,7 +365,6 @@ class Store { // склад
 
 		this.#complianceMin();
 
-		console.log(this.#statisticList);
 
 		this.#profitAll = this.#profitAll + this.#profitDay - this.#losses;
 		this.#orderList = []; // сброс списка заказов
@@ -316,12 +372,30 @@ class Store { // склад
 
 	getStatistic = () => this.#morningStatisticList;
 
+	getResult = () => this.#result;
+
+	getShortRes = () => {
+		const profit = this.#result.reduce((res, {profitCost}) => res + profitCost, 0);
+		const losses = this.#result.reduce((res, {totalLosses}) => res + totalLosses, 0);
+		return(
+			[{
+				volume: this.#result.reduce((res, {totalCost}) => res + totalCost, 0),
+				profit,
+				losses,
+				result: profit - losses
+			}]
+		)
+	}
+
 	getShortStat = () => {
+		const profit = this.#morningStatisticList.reduce((res, {profitCost}) => res + profitCost, 0);
+		const losses = this.#morningStatisticList.reduce((res, {totalLosses}) => res + totalLosses, 0);
 		return(
 			[{
 				volume: this.#morningStatisticList.reduce((res, {totalCost}) => res + totalCost, 0),
-				profit: this.#morningStatisticList.reduce((res, {profitCost}) => res + profitCost, 0),
-				losses: this.#morningStatisticList.reduce((res, {totalLosses}) => res + totalLosses, 0),
+				profit,
+				losses, 
+				result: profit - losses 
 			}]
 		)
 	}
@@ -331,6 +405,9 @@ class Store { // склад
 			item.order.map(({id, amount}) => {
 				let stat = this.#statisticList[id - 201];
 				stat.orderAmount = stat.orderAmount + amount;
+
+				let res = this.#result[id - 201];
+				res.orderAmount = res.orderAmount + amount;
 			})	
 		);
 
@@ -339,12 +416,22 @@ class Store { // склад
 			stat.departuresAmount = stat.departuresAmount + amount;
 			stat.totalCost = stat.totalCost + price * amount;
 			stat.profitCost = stat.profitCost + (price - this.#productsBase.getProductbyId(id).initialPrice) * amount;
+			
+			let res = this.#result[id - 201];
+			res.departuresAmount = stat.departuresAmount + amount;
+			res.totalCost = res.totalCost + price * amount;
+			res.profitCost = res.profitCost + (price - this.#productsBase.getProductbyId(id).initialPrice) * amount;
+			
 		})
 
 		this.#products.filter(item => item.expiryDate == 0).map(({id, amount, initialPrice}) => {
 			let stat = this.#statisticList[id - 201];
 			stat.totalLosses = stat.totalLosses + amount * initialPrice;
 			stat.lossesAmount = stat.lossesAmount + amount;
+
+			let res = this.#result[id - 201];
+			res.totalLosses = res.totalLosses + amount * initialPrice;
+			res.lossesAmount = res.lossesAmount + amount;
 		})
 	}
 
@@ -408,7 +495,8 @@ class Store { // склад
 	}
 
 	#writeOf = () => { // удаление просрочки
-		this.#losses = this.#products.filter(product => product.expiryDate == 0).reduce((res, {initialPrice, amount}) => res + initialPrice * amount, 0);
+		this.#scrappedProducts = this.#products.filter(product => product.expiryDate == 0)
+		this.#losses = this.#scrappedProducts.reduce((res, {initialPrice, amount}) => res + initialPrice * amount, 0);
 		this.#products = this.#products.filter(product => product.expiryDate > 0);
 	}
 
@@ -438,8 +526,6 @@ class Store { // склад
 		return(this.#products.filter(product => product.id != id));
 	}
 
-		
-
 	getProducts = () => this.#morningPropucts.sort((a, b) => { // получить список продуктов на складе
 		if(a.id < b.id) {
 			return(-1);
@@ -449,6 +535,8 @@ class Store { // склад
 		}
 		return(1);
 	});
+
+	getScrappedProducts = () => this.#scrappedProducts;
 
 	getOrderList = () => this.#getList(this.#morningOrders);
 
@@ -501,15 +589,8 @@ class Store { // склад
 		const expectedDelivery = this.#expectedDeliveries.find(item => item.id == id);
 		return(expectedDelivery == undefined ? 0 : expectedDelivery.amount);
 	};
-
-	getLosses = () => this.#losses;
-	getVolume = () => this.#volume;
-	getProfitDay = () => this.#profitDay;
-	getProfitAll = () => this.#profitAll;
 }
-
-
-// нужно добавить сбор статистики по продажам/заявкам за день;
+;
 // переписать класс на основе main.js 
 
 // добавить генерацию ордеров для ритейлеров
@@ -528,7 +609,8 @@ class Tester {
 	#retailersAmount; // кол-во торговых точек
 	#productsAmount;  // кол-во видов продуктов
 
-	#history = [];
+	#history = []; // история по дням
+	#result = [];  // итоги эксперимента
 
 	constructor(db, days, retailersAmount, productsAmount) {
 		const newDb = {
@@ -559,11 +641,16 @@ class Tester {
 		this.#store.newDay();
 		this.#currentDay = this.#currentDay + 1;
 
-		this.#history = [...this.#history, {day: this.#currentDay, stat: this.#store.getStatistic()}]
+		this.#history = [...this.#history, {
+			day: this.#currentDay, 
+			stat: this.#store.getStatistic(),
+			short: this.#store.getShortStat()
+		}]
 			
 		updateUI(this.#store);
 		updateCounter(this.#currentDay, this.#days);
 		if(this.#currentDay == this.#days) {
+			this.#calcResult();
 			nextBtn.classList.add('hide');
 			resultsBtn.classList.remove('hide')
 		}
@@ -580,9 +667,16 @@ class Tester {
 		})
 	}
 	
+	#calcResult = () => {
+		this.#history.forEach(item => {
+			console.log(item.stat)
+		})
+	}
+
 	getCurrentDay = () => this.#currentDay;
 
 	getHistory = () => this.#history;
+	getResult = () => [{stat: this.#store.getResult(), short: this.#store.getShortRes()}];
 }
 
 
@@ -621,7 +715,8 @@ resultsBtn.addEventListener('click', () => {
 	experiment.classList.add('hide');
 	results.classList.remove('hide');
 	console.log(tester.getHistory());
-	drawHistory(tester.getHistory());
+	drawHistory(historyResult, tester.getResult())
+	drawHistory(historyByDay, tester.getHistory());
 })
 
 

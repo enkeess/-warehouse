@@ -32,7 +32,8 @@ resultsBtn.addEventListener('click', () => {
 	experiment.classList.add('hide');
 	results.classList.remove('hide');
 	console.log(tester.getHistory());
-	drawHistory(tester.getHistory());
+	drawHistory(historyResult, tester.getResult())
+	drawHistory(historyByDay, tester.getHistory());
 })
 
 

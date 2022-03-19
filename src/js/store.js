@@ -46,6 +46,7 @@ function StatisticItem(id) {
 
 class Store { // склад
 	#products;
+	#scrappedProducts;
 	#productsBase;
 	#config;
 	#profitFactor = 1.2; // наценка 
@@ -56,6 +57,7 @@ class Store { // склад
 	#losses;
 	#profitAll = 0;
 	#statisticList = [];
+	#result = [];
 
 	#morningPropucts;
 	#morningOrders;
@@ -80,8 +82,8 @@ class Store { // склад
 		this.#morningPropucts = this.#products;
 		this.#morningOrders = this.#orderList;
 		this.#statisticList = db.products.map(item => new StatisticItem(item.id));
-
-		console.log(this.#statisticList);
+		this.#result = db.products.map(item => new StatisticItem(item.id));
+		this.#scrappedProducts = [];
 	}
 
 	#orderList = []; // список заказов от точек
@@ -120,9 +122,7 @@ class Store { // склад
 		this.#profitDay = 0;
 
 		this.#statisticList = db.products.map(item => new StatisticItem(item.id));
-
-		console.log(this.#statisticList);
-
+		
 		this.#orderList.map(orderListItem => { // проходимся по списку заказов и отправляем все что можем
 			orderListItem.order.map(order => {
 				this.#tryStore(order, orderListItem.retailer.getId());
@@ -140,7 +140,6 @@ class Store { // склад
 
 		this.#complianceMin();
 
-		console.log(this.#statisticList);
 
 		this.#profitAll = this.#profitAll + this.#profitDay - this.#losses;
 		this.#orderList = []; // сброс списка заказов
@@ -148,12 +147,30 @@ class Store { // склад
 
 	getStatistic = () => this.#morningStatisticList;
 
+	getResult = () => this.#result;
+
+	getShortRes = () => {
+		const profit = this.#result.reduce((res, {profitCost}) => res + profitCost, 0);
+		const losses = this.#result.reduce((res, {totalLosses}) => res + totalLosses, 0);
+		return(
+			[{
+				volume: this.#result.reduce((res, {totalCost}) => res + totalCost, 0),
+				profit,
+				losses,
+				result: profit - losses
+			}]
+		)
+	}
+
 	getShortStat = () => {
+		const profit = this.#morningStatisticList.reduce((res, {profitCost}) => res + profitCost, 0);
+		const losses = this.#morningStatisticList.reduce((res, {totalLosses}) => res + totalLosses, 0);
 		return(
 			[{
 				volume: this.#morningStatisticList.reduce((res, {totalCost}) => res + totalCost, 0),
-				profit: this.#morningStatisticList.reduce((res, {profitCost}) => res + profitCost, 0),
-				losses: this.#morningStatisticList.reduce((res, {totalLosses}) => res + totalLosses, 0),
+				profit,
+				losses, 
+				result: profit - losses 
 			}]
 		)
 	}
@@ -163,6 +180,9 @@ class Store { // склад
 			item.order.map(({id, amount}) => {
 				let stat = this.#statisticList[id - 201];
 				stat.orderAmount = stat.orderAmount + amount;
+
+				let res = this.#result[id - 201];
+				res.orderAmount = res.orderAmount + amount;
 			})	
 		);
 
@@ -171,12 +191,22 @@ class Store { // склад
 			stat.departuresAmount = stat.departuresAmount + amount;
 			stat.totalCost = stat.totalCost + price * amount;
 			stat.profitCost = stat.profitCost + (price - this.#productsBase.getProductbyId(id).initialPrice) * amount;
+			
+			let res = this.#result[id - 201];
+			res.departuresAmount = stat.departuresAmount + amount;
+			res.totalCost = res.totalCost + price * amount;
+			res.profitCost = res.profitCost + (price - this.#productsBase.getProductbyId(id).initialPrice) * amount;
+			
 		})
 
 		this.#products.filter(item => item.expiryDate == 0).map(({id, amount, initialPrice}) => {
 			let stat = this.#statisticList[id - 201];
 			stat.totalLosses = stat.totalLosses + amount * initialPrice;
 			stat.lossesAmount = stat.lossesAmount + amount;
+
+			let res = this.#result[id - 201];
+			res.totalLosses = res.totalLosses + amount * initialPrice;
+			res.lossesAmount = res.lossesAmount + amount;
 		})
 	}
 
@@ -240,7 +270,8 @@ class Store { // склад
 	}
 
 	#writeOf = () => { // удаление просрочки
-		this.#losses = this.#products.filter(product => product.expiryDate == 0).reduce((res, {initialPrice, amount}) => res + initialPrice * amount, 0);
+		this.#scrappedProducts = this.#products.filter(product => product.expiryDate == 0)
+		this.#losses = this.#scrappedProducts.reduce((res, {initialPrice, amount}) => res + initialPrice * amount, 0);
 		this.#products = this.#products.filter(product => product.expiryDate > 0);
 	}
 
@@ -270,8 +301,6 @@ class Store { // склад
 		return(this.#products.filter(product => product.id != id));
 	}
 
-		
-
 	getProducts = () => this.#morningPropucts.sort((a, b) => { // получить список продуктов на складе
 		if(a.id < b.id) {
 			return(-1);
@@ -281,6 +310,8 @@ class Store { // склад
 		}
 		return(1);
 	});
+
+	getScrappedProducts = () => this.#scrappedProducts;
 
 	getOrderList = () => this.#getList(this.#morningOrders);
 
@@ -333,12 +364,4 @@ class Store { // склад
 		const expectedDelivery = this.#expectedDeliveries.find(item => item.id == id);
 		return(expectedDelivery == undefined ? 0 : expectedDelivery.amount);
 	};
-
-	getLosses = () => this.#losses;
-	getVolume = () => this.#volume;
-	getProfitDay = () => this.#profitDay;
-	getProfitAll = () => this.#profitAll;
 }
-
-
-// нужно добавить сбор статистики по продажам/заявкам за день

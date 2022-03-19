@@ -57,7 +57,7 @@
 				<label>
 					Кол-во дней моделирования
 					<select id="days" name="days">
-						<option value="1">1</option>
+						<!-- <option value="1">1</option> -->
 						<option value="10">10</option>
 						<option value="11">11</option>
 						<option value="12">12</option>
@@ -94,90 +94,44 @@
 			<div class="flex">
 				<div class="block">
 					<h2>Товары на складе</h2>
-					<div id="warehouse" class="table">
-						<div class="table__line table__top ">
-							<span>Код товара</span>
-							<span>Кол-во единиц</span>
-							<span>Срок годности (дней) </span>
-							<span>Закупочная цена за единицу (у.е)</span>
-							<span>Базовая наценка (%)</span>
-							<span>Наценка с учетом уценки (%)</span>
-							<span>Цена за единицу (у.е)</span>
-						</div>
-					
-						<ul id="warehouse-list" class="table__list">
-					
-						</ul>
-					</div>
+					<ul id="warehouse-list" class="table"></ul>
+
 				</div>
 
 				<div class="block">
 					<h2>Ожидаемые поставки</h2>
-					<div id="expected" class="table">
-						<div class="table__line table__top ">
-							<span>Код товара</span>
-							<span>Кол-во единиц</span>
-						</div>
-
-						<ul id="expected-list" class="table__list">
-
-						</ul>
-					</div>
+					<ul id="expected-list" class="table"></ul>
 				</div>
 			</div>
+
+			
 			
 
 			<div class="flex">
 				<div class="block">
 					<h2>Список заказов от торговых точек</h2>
-					<div id="orders" class="table">
-						<div class="table__line table__top ">
-							<span>Код товара</span>
-							<span>Торговая точка</span>
-							<span>Кол-во единиц</span>
-						</div>
-					
-						<ul id="orders-list" class="table__list">
-					
-						</ul>
-					</div>
+					<ul id="orders-list" class="table"></ul>
 				</div>
 
 				<div class="block">
 					<h2>Сформированный список перевозок</h2>
-					<div id="departures" class="table">
-						<div class="table__line table__top ">
-							<span>Код товара</span>
-							<span>Торговая точка</span>
-							<span>Кол-во единиц</span>
-							<span>Цена за единицу (у.е)</span>
-						</div>
-				
-						<ul id="departures-list" class="table__list">
-				
-						</ul>
-					</div>
+					<ul id="departures-list" class="table"></ul>
 				</div>
 
 				<div class="block">
 					<h2>Статистика</h2>
-
-					<div class="table table_tr">
-						<div class="table__top table__line">
-							<span>Объем продаж за день: </span>
-							<span>Чистая прибыль за день: </span>
-							<span>Потери при списании: </span>
-							<!-- <span>Чистая прибыль за все дни:</span> -->
-						</div>
-
-						<ul id="stat-list" class="table__list">
-						
-						</ul>
-					</div>
-
-					
+					<ul id="stat-list" class="table table_tr"></ul>
 				</div>
 			</div>
+
+
+			<div class="flex">
+				<div class="block">
+					<h2>Списанные товары</h2>
+					<ul id="scrapped-list" class="table"></ul>
+				</div>
+			</div>
+
 			<div class="manage-panel">
 				<div class="counter">
 					<span id="currentDay">0</span>
@@ -190,28 +144,28 @@
 		</div>
 
 		<div class="hide" id="results">
-			<h2>Подбробная статистика эксперимента по дням</h2>
-			<div id="history">
+
+			<h2>Результаты эксперимента</h2>
+
+			<div id="historyResult">
 				<div class="history__block block">
 					<h3 class="history__title">День</h3>
-					
-					<div class="history__item table">
-						<div class="table__line table__top ">
-							<span>Код товара</span>
-							<span>Объем заявок</span>
-							<span>Объем отгруженных</span>
-							<span>Списано</span>
-							<span>Общая стоимость</span>
-							<span>Чистая прибыль </span>
-							<span>Потери от списания</span>
-						</div>
-
-						<!-- <ul class="history__list table__list">
-
-						</ul> -->
+					<div class="flex history__wrapper">
+						<ul class="history__item table"></ul>
+						<ul class="history__stat table table_tr"></ul>
 					</div>
-					
-					
+				</div>
+			</div>
+
+
+			<h2>Подбробная статистика эксперимента по дням</h2>
+			<div id="historyByDay">
+				<div class="history__block block">
+					<h3 class="history__title">День</h3>
+					<div class="flex history__wrapper">
+						<ul class="history__item table block"></ul>
+						<ul class="history__stat table table_tr block"></ul>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -240,22 +194,6 @@
 
 		}
 	</script> -->
-
-	<!-- <ul class="table table_tr">
-		<li class="table__top table__line">
-			<span>Объем продаж за день: </span>
-			<span>Объем продаж за день: </span>
-			<span>Объем продаж за день: </span>
-		</li>
-
-		<li class="table__line table__item">
-			<span>10</span>
-			<span>15</span>
-			<span>45244</span>
-		</li>
-		
-		
-	</ul> -->
 
 </body>
 

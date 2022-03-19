@@ -6,24 +6,72 @@ const experiment = document.querySelector('#experiment');
 const results = document.querySelector('#results');
 
 const warehouseList = document.querySelector('#warehouse-list');
-const ordersList = document.querySelector('#orders-list');
-const departuresList = document.querySelector('#departures-list');
-const expectedList = document.querySelector('#expected-list');
-const statList = document.querySelector('#stat-list');
+const warehouseTopList = [
+	'Код товара',
+	'Кол-во единиц',
+	'Срок годности (дней) ',
+	'Закупочная цена за единицу (у.е)',
+	'Базовая наценка (%)',
+	'Наценка с учетом уценки (%)',
+	'Цена за единицу (у.е)'
+]
 
-const history = document.querySelector('#history');
+const scrappedList = document.querySelector('#scrapped-list')
+
+
+const ordersList = document.querySelector('#orders-list');
+const orderTopList = [
+	'Код товара',
+	'Торговая точка',
+	'Кол-во единиц'
+]
+
+const departuresList = document.querySelector('#departures-list');
+const departuresTopList = [
+	'Код товара',
+	'Торговая точка',
+	'Кол-во единиц',
+	'Цена за единицу (у.е)'
+]
+
+const expectedList = document.querySelector('#expected-list');
+const expectedTopList = [
+	'Код товара',
+	'Кол-во единиц'
+]
+
+const statList = document.querySelector('#stat-list');
+const statTopList = [
+	'Объем продаж',
+	'Чистая прибыль',
+	'Потери при списании',
+	'Итог'
+]
+
+const historyByDay = document.querySelector('#historyByDay');
+const historyResult = document.querySelector('#historyResult');
 const historyBlock = document.querySelector('.history__block');
 const historyTitle = document.querySelector('.history__title');
 const historyItem = document.querySelector('.history__item');
+const historyStat = document.querySelector('.history__stat');
+const historyWrapper = document.querySelector('.history__wrapper');
+
+const historyTopItem = [
+	'Код товара',
+	'Объем заявок',
+	'Объем отгруженных',
+	'Списано',
+	'Общая стоимость',
+	'Чистая прибыль ',
+	'Потери от списания'
+]
+
+
 
 const currentDay = document.querySelector('#currentDay');
 const allDays = document.querySelector('#allDays');
 
-history.append(historyItem.cloneNode(true));
 const form = document.querySelector('#form');
-
-
-
 
 const clearUI = (parent) => {
 	while (parent.firstChild) {
@@ -33,10 +81,21 @@ const clearUI = (parent) => {
 
 clearUI(history);
 
-const drawTable = (parent, data) => {
+
+const withSpan = (text) => {
+	const span = document.createElement('span');
+	span.innerText = text;
+	return span;
+}
+
+const drawTable = (parent, top, data) => {
 	clearUI(parent);
 
-	console.log(data);
+	let tableTop = document.createElement('li');
+	tableTop.classList.add('table__line', 'table__top');
+	top.map(item => tableTop.append(withSpan(item)));
+
+	parent.append(tableTop);
 
 	let tableRows = data.map((node) => {
 		let tableRow = document.createElement('li');
@@ -53,18 +112,13 @@ const drawTable = (parent, data) => {
 	tableRows.forEach(item => parent.append(item));
 }
 
-const drawSpan = (parent, data) => {
-	parent.innerText = data;
-}
-
 const updateUI = (store) => {
-	drawTable(ordersList, store.getOrderList());
-	drawTable(warehouseList, store.getProducts());
-	drawTable(departuresList, store.getDepartures());
-	drawTable(expectedList, store.getExpectedDeliveries());
-
-	drawTable(statList, store.getShortStat());
-
+	drawTable(ordersList, orderTopList, store.getOrderList());
+	drawTable(warehouseList, warehouseTopList, store.getProducts());
+	drawTable(scrappedList, warehouseTopList, store.getScrappedProducts());
+	drawTable(departuresList, departuresTopList, store.getDepartures());
+	drawTable(expectedList, expectedTopList, store.getExpectedDeliveries());
+	drawTable(statList, statTopList, store.getShortStat());
 }
 
 const updateCounter = (curDay, days) => {
@@ -73,26 +127,29 @@ const updateCounter = (curDay, days) => {
 }
 
 
-const drawHistory = (historyData) => {
-	clearUI(history);
-	const historyList = document.createElement('ul');
-	historyList.classList.add('history__list', 'table__list');
-	const historyItemWrapper = document.createElement('div');
-	historyItemWrapper.classList.add('flex');
+const drawHistory = (parent, data) => {
+	clearUI(parent);
 
-	historyData.forEach(item => {
+	data.forEach(item => {
 		console.log(item);
 		let newHistoryBlock = historyBlock.cloneNode();
-		let newHistoryItem = historyItem.cloneNode(true);
-		let newHistoryList = historyList.cloneNode();
-		let newHistoryItemWrapper = historyItemWrapper.cloneNode();
 		const newHistoryTitle = historyTitle.cloneNode();
-		newHistoryTitle.innerText = `День ${item.day}`;
-		drawTable(newHistoryList, item.stat);
-		newHistoryItem.append(newHistoryList);
-		newHistoryItemWrapper.append(newHistoryItem);
+		let newHistoryItem = historyItem.cloneNode();
+		let newHistoryStat = historyStat.cloneNode();
+
+		let newHistoryWrapper = historyWrapper.cloneNode();
+		
+		if(item.day) newHistoryTitle.innerText = `День ${item.day}`;
+
+		drawTable(newHistoryItem, historyTopItem, item.stat);
+		drawTable(newHistoryStat, statTopList, item.short);
+		
+		newHistoryWrapper.append(newHistoryItem);
+		newHistoryWrapper.append(newHistoryStat);
+		
 		newHistoryBlock.append(newHistoryTitle);
-		newHistoryBlock.append(newHistoryItemWrapper);
-		history.append(newHistoryBlock);
+		newHistoryBlock.append(newHistoryWrapper);
+
+		parent.append(newHistoryBlock);
 	})
 }

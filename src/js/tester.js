@@ -16,7 +16,8 @@ class Tester {
 	#retailersAmount; // кол-во торговых точек
 	#productsAmount;  // кол-во видов продуктов
 
-	#history = [];
+	#history = []; // история по дням
+	#result = [];  // итоги эксперимента
 
 	constructor(db, days, retailersAmount, productsAmount) {
 		const newDb = {
@@ -47,11 +48,16 @@ class Tester {
 		this.#store.newDay();
 		this.#currentDay = this.#currentDay + 1;
 
-		this.#history = [...this.#history, {day: this.#currentDay, stat: this.#store.getStatistic()}]
+		this.#history = [...this.#history, {
+			day: this.#currentDay, 
+			stat: this.#store.getStatistic(),
+			short: this.#store.getShortStat()
+		}]
 			
 		updateUI(this.#store);
 		updateCounter(this.#currentDay, this.#days);
 		if(this.#currentDay == this.#days) {
+			this.#calcResult();
 			nextBtn.classList.add('hide');
 			resultsBtn.classList.remove('hide')
 		}
@@ -68,9 +74,16 @@ class Tester {
 		})
 	}
 	
+	#calcResult = () => {
+		this.#history.forEach(item => {
+			console.log(item.stat)
+		})
+	}
+
 	getCurrentDay = () => this.#currentDay;
 
 	getHistory = () => this.#history;
+	getResult = () => [{stat: this.#store.getResult(), short: this.#store.getShortRes()}];
 }
 
 
