@@ -9,7 +9,6 @@
 	<link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
-	<link rel="manifest" href="./favicon/site.webmanifest">
 	<link rel="mask-icon" href="./favicon/safari-pinned-tab.svg" color="#5bbad5">
 	<meta name="msapplication-TileColor" content="#da532c">
 	<meta name="theme-color" content="#ffffff">
@@ -19,73 +18,25 @@
 </head>
 
 <body class="main__body">
-
     <main> 
-		<h1>Склад</h1>
-
+		<h1>Склад</h1>		
 		<div class="setup">
 			<form id="form" class="block">
 				<h2>Настройка параметров моделирования</h2>
-				<label>
-					Кол-во торговых точек
-					<select id="retailersAmount" name="retailersAmount">
-						<option value="3">3</option>
-						<option value="4">4</option>
-						<option value="5">5</option>
-						<option value="6">6</option>
-						<option value="7">7</option>
-						<option value="8">8</option>
-						<option value="9">9</option>
-					</select>
-				</label>
+
+				<label for="retailersAmount">Кол-во торговых точек</label>
+				<select id="retailersAmount" name="retailersAmount"></select>
 				
-				<label>
-					Кол-во продуктовых товаров
-					<select id="productsAmount" name="productsAmount">
-						<option value="12">12</option>
-						<option value="13">13</option>
-						<option value="14">14</option>
-						<option value="15">15</option>
-						<option value="16">16</option>
-						<option value="17">17</option>
-						<option value="18">18</option>
-						<option value="19">19</option>
-						<option value="20">20</option>
-					</select>
-				</label>
-
-				<label>
-					Кол-во дней моделирования
-					<select id="days" name="days">
-						<!-- <option value="1">1</option> -->
-						<option value="10">10</option>
-						<option value="11">11</option>
-						<option value="12">12</option>
-						<option value="13">13</option>
-						<option value="14">14</option>
-						<option value="15">15</option>
-						<option value="16">16</option>
-						<option value="17">17</option>
-						<option value="18">18</option>
-						<option value="19">19</option>
-						<option value="20">20</option>
-						<option value="21">21</option>
-						<option value="22">22</option>
-						<option value="23">23</option>
-						<option value="24">24</option>
-						<option value="25">25</option>
-						<option value="26">26</option>
-						<option value="27">27</option>
-						<option value="28">28</option>
-						<option value="29">29</option>
-						<option value="30">30</option>
-					</select>
-				</label>
-
-				<label>
-					Файл конфигурации:
-					<input name="config" type="file"></input>
-				</label>
+				<label for="productsAmount">Кол-во продуктовых товаров</label>
+				<select id="productsAmount" name="productsAmount"></select>
+				
+		
+				<label for="days">Кол-во дней моделирования</label>
+				<select id="days" name="days"></select>
+				
+				<label for="config">Файл конфигурации:</label>
+				<input name="config" type="file" required></input>
+				
 				<button id="start" class="btn"> Начать новый эксперимент </button>
 			</form>
 		</div>
@@ -95,7 +46,11 @@
 				<div class="block">
 					<h2>Товары на складе</h2>
 					<ul id="warehouse-list" class="table"></ul>
+				</div>
 
+				<div class="block">
+					<h2>Списанные товары</h2>
+					<ul id="scrapped-list" class="table"></ul>
 				</div>
 
 				<div class="block">
@@ -104,12 +59,9 @@
 				</div>
 			</div>
 
-			
-			
-
-			<div class="flex">
+			<div id="details" class="flex">
 				<div class="block">
-					<h2>Список заказов от торговых точек</h2>
+					<h2>Заказы торговых точек</h2>
 					<ul id="orders-list" class="table"></ul>
 				</div>
 
@@ -119,34 +71,33 @@
 				</div>
 
 				<div class="block">
+					<h2>Заявки поставщику</h2>
+					<ul class="table" id="provider-orders"></ul>
+				</div>
+
+				<div class="block">
 					<h2>Статистика</h2>
 					<ul id="stat-list" class="table table_tr"></ul>
 				</div>
-			</div>
-
-
-			<div class="flex">
-				<div class="block">
-					<h2>Списанные товары</h2>
-					<ul id="scrapped-list" class="table"></ul>
-				</div>
+				
 			</div>
 
 			<div class="manage-panel">
 				<div class="counter">
+					День эксперимента: 
 					<span id="currentDay">0</span>
 					/
 					<span id="allDays">0</span>
 				</div>
+
+				<button id="get-orders" class="btn">Получить заявки</button>
 				<button id="next" class="btn next">Следующий день</button>
 				<button id="resultsBtn" class="btn hide"> Показать результаты эксперимента </button>
 			</div>
 		</div>
 
 		<div class="hide" id="results">
-
 			<h2>Результаты эксперимента</h2>
-
 			<div id="historyResult">
 				<div class="history__block block">
 					<h3 class="history__title">День</h3>
@@ -156,7 +107,6 @@
 					</div>
 				</div>
 			</div>
-
 
 			<h2>Подбробная статистика эксперимента по дням</h2>
 			<div id="historyByDay">
@@ -170,34 +120,7 @@
 			</div>
 		</div>
 	</main>
-
-	<!-- <input type="file" onchange="readFile(this)">
-	
-	<script>
-		function readFile(input) {
-			let file = input.files[0];
-
-			let reader = new FileReader();
-
-			reader.readAsText(file);
-
-			reader.onload = function () {
-				console.log(reader.result);
-				const newBD = JSON.parse(reader.result);
-				console.log(newBD);
-
-			};
-
-			reader.onerror = function () {
-				console.log(reader.error);
-			};
-
-		}
-	</script> -->
-
 </body>
 
 <script type="module" src="./js/scripts.js"></script>
-<!-- <script src="./js/main.js"></script> -->
-
 </html>

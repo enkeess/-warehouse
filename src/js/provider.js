@@ -20,7 +20,6 @@ class Provider {
 
 		const readyOrders = this.#orderList.filter(item => item.leadTime == 0); // готовые к отправке заказы
 		this.#orderList = this.#orderList.filter(item => item.leadTime > 0);    // оставшиеся заказы
-		readyOrders.map(item => consumer.getOrder(item.order));                 // отправка заказов потребителю
+		readyOrders.map(item => consumer.acceptOrder(item.order));              // отправка заказов потребителю
 	}
 }
-

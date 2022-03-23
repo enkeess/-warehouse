@@ -1,17 +1,9 @@
-"use strict";
-
-let days = +form.days.value;
-let productsAmount = +form.productsAmount.value;
-let retailersAmount = +form.retailersAmount.value;
-
-let tester;
-
 nextBtn.classList.add('hide');
-
 nextBtn.addEventListener('click', ()=>{
 	tester.nextStep();
 })
 
+form.config.addEventListener('change', (e) => readFile(e.target));
 form.addEventListener('submit', (e) => {
 	e.preventDefault();
 
@@ -24,21 +16,19 @@ form.addEventListener('submit', (e) => {
 	retailersAmount = +form.retailersAmount.value;
 
 	tester = new Tester(db, days, retailersAmount, productsAmount);
-	
 });
 
+getOrdersBtn.addEventListener('click', () => {
+	tester.makeOrders();
+})
 
 resultsBtn.addEventListener('click', () => {
 	experiment.classList.add('hide');
 	results.classList.remove('hide');
-	console.log(tester.getHistory());
+	
+	tester.updateHistory();
+	tester.calcResult();
+	
 	drawHistory(historyResult, tester.getResult())
 	drawHistory(historyByDay, tester.getHistory());
 })
-
-
-// что блять мне еще надо сделать
-// да дохуя чего еще
-// надеюсь завтра это закончится
-
-

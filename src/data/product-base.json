@@ -2,86 +2,98 @@
 	"products": [
 		{
 			"id": 201,
-			"title": "Молоко",
 			"initialPrice": 99,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 202,
-			"title": "Хлеб",
 			"initialPrice": 25,
-			"expiryDate": 2
+			"expiryDate": 2,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 203,
-			"title": "Сыр",
 			"initialPrice": 300,
-			"expiryDate": 7
+			"expiryDate": 7,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 204,
-			"title": "Яйца",
 			"initialPrice": 59,
-			"expiryDate": 3
+			"expiryDate": 3,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 205,
-			"title": "Сахар",
 			"initialPrice": 40,
-			"expiryDate": 10
+			"expiryDate": 10,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 206,
-			"title": "Гречка",
 			"initialPrice": 80,
-			"expiryDate": 10
+			"expiryDate": 10,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 207,
-			"title": "Картошка",
 			"initialPrice": 20,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 208,
-			"title": "Масло",
 			"initialPrice": 90,
-			"expiryDate": 7
+			"expiryDate": 7,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 209,
-			"title": "Чай",
 			"initialPrice": 35,
-			"expiryDate": 20
+			"expiryDate": 20,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 210,
-			"title": "Рыба",
 			"initialPrice": 120,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 211,
-			"title": "Курица",
 			"initialPrice": 150,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20,
+			"pack": 15
 		},
 
 		{
 			"id": 212,
-			"title": "Говядина",
 			"initialPrice": 200,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20,
+			"pack": 15
 		}
 	],
 
@@ -163,55 +175,64 @@
 		{
 			"id": 202,
 			"amount": 20,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20
 		},
 
 		{
 			"id": 201,
 			"amount": 30,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20
 		},
 
 		{
 			"id": 201,
 			"amount": 20,
-			"expiryDate": 4
+			"expiryDate": 4,
+			"margin": 20
 		},
 
 		{
 			"id": 203,
 			"amount": 20,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20
 		},
 
 		{
 			"id": 203,
 			"amount": 10,
-			"expiryDate": 7
+			"expiryDate": 7,
+			"margin": 20
 		},
 
 		{
 			"id": 204,
 			"amount": 50,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20
 		},
 
 		{
 			"id": 205,
 			"amount": 60,
-			"expiryDate": 7
+			"expiryDate": 7,
+			"margin": 20
 		},
 
 		{
 			"id": 209,
 			"amount": 50,
-			"expiryDate": 5
+			"expiryDate": 5,
+			"margin": 20
 		},
 
 		{
 			"id": 212,
 			"amount": 30,
-			"expiryDate": 7
+			"expiryDate": 7,
+			"margin": 20
 		}
 	]
 }
