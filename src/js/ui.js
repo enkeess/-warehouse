@@ -80,9 +80,13 @@ const currentDay = document.querySelector('#currentDay');
 const allDays = document.querySelector('#allDays');
 
 const form = document.querySelector('#form');
-addOptions(form.days, 1, 30);
-addOptions(form.productsAmount, 12, 18);
-addOptions(form.retailersAmount, 1, 9);
+addOptions(form.days, 1, 30, 10);
+addOptions(form.productsAmount, 12, 18, 12);
+addOptions(form.retailersAmount, 1, 9, 9);
+addOptions(form.minOrder, 10, 100, 10);
+addOptions(form.maxOrder, 100, 300, 300);
+addOptions(form.minDispatchTime, 1, 5, 1);
+addOptions(form.maxDispatchTime, 1, 5, 5);
 
 const drawTable = (parent, top, data, action) => {
 	clearUI(parent);

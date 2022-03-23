@@ -1,22 +1,3 @@
-
-function StatisticItem(id) {
-	// id;               // код товара
-	// orderAmount;      // объем заявок на поставки
-	// departuresAmount; // объем отгруженных заявок
-	// lossesAmount;     // объем списанных товаров
-	// totalCost;        // общая стоимость проданных товаров
-	// profitCost;       // чистая прибыль от продажи товаров
-	// totalLosses;      // общая потеря от списывания
-	
-	this.id = id;
-	this.orderAmount = 0;
-	this.departuresAmount = 0;
-	this.lossesAmount = 0;
-	this.totalCost = 0;
-	this.profitCost = 0;
-	this.totalLosses = 0;
-}
-
 class Store { // склад
 
 //  ----- Private Var ----- //
@@ -27,7 +8,7 @@ class Store { // склад
 	#products;              // текущий список продуктов после отправки заказчикам
 	#morningPropucts;       // список продуктов на складе в начале дня
 	#morningOrders;			// заказы от торговых точек в начале дня
-	#orderList;             // список заказов от точек
+	#retailerOrderList;             // список заказов от точек
 	#departures;            // список отправлений точкам
 	#expectedDeliveries;    // ожидаемые поставки
 	#providerOrders;        // список заявок на поставки
@@ -41,45 +22,31 @@ class Store { // склад
 		this.#provider = provider;
 
 		this.#products = db.initialStore.map(product => {
-			let {initialPrice, pack} = this.#productsBase[product.id - 201];
-			return({
-				id: product.id,
-				amount: product.amount,
-				pack,
-				expiryDate: product.expiryDate,
-				initialPrice,
-				margin: product.margin,
-				price: Math.round(initialPrice * (1 + product.margin / 100))
-			})
+			return new StoreProduct({...this.#productsBase[product.id - 201], ...product})
 		}); 
 
-		this.#orderList = [];
+		this.#retailerOrderList = [];
 		this.#departures = [];
 		this.#scrappedProducts = [];
 		this.#expectedDeliveries = [];
 		this.#providerOrders = [];
 
 		this.#morningPropucts = this.#products;
-		this.#morningOrders   = this.#orderList;
-		this.#statisticList   = this.#productsBase.map(item => new StatisticItem(item.id));
+		this.#morningOrders   = this.#retailerOrderList;
+		this.#statisticList   = this.#productsBase.map(item => new StatisticItem({id:item.id}));
+
+		console.log(this.#productsBase);
 	}
 //  ----- Constructor ----- //
 
 //  ----- External Interactions ----- //
 	acceptOrder = (order) => { // принять заказ от поставщика
-		const {id, initialPrice, expiryDate, margin, pack} = this.#productsBase[order.id - 201];
-
 		this.#products = [
 			...this.#products,
-			{
-				id,
-				amount: order.amount,
-				pack,
-				expiryDate,
-				initialPrice,
-				margin,
-				price: Math.round(initialPrice * (1 + margin / 100))
-			}
+			new StoreProduct({
+				...this.#productsBase[order.id - 201],
+				...order
+			})
 		]
 
 		this.#expectedDeliveries = this.#expectedDeliveries.map(item => {
@@ -88,7 +55,7 @@ class Store { // склад
 	}
 
 	newOrder = (retailer, order) => { // принять заявку на заказ потребителя
-		this.#orderList = [...this.#orderList, {retailer: retailer, order: order}];
+		this.#retailerOrderList = [...this.#retailerOrderList, {retailer: retailer, order: order}];
 	} 
 
 //  ----- External Interactions ----- //
@@ -97,16 +64,14 @@ class Store { // склад
 //  ----- Private ----- //
 
 	#collectStatistic = () => { // собрать статистику по дню
-		this.#statisticList = this.#productsBase.map(item => new StatisticItem(item.id));
+		this.#statisticList = this.#productsBase.map(item => new StatisticItem({id: item.id}));
 
-		this.#morningOrders.map(item => 
-			item.order.map(({id, amount}) => {
-				let stat = this.#statisticList[id - 201];
-				stat.orderAmount = stat.orderAmount + amount;
-			})	
-		);
+		this.#morningOrders.forEach(({id, amount}) => {
+			let stat = this.#statisticList[id - 201];
+			stat.orderAmount = stat.orderAmount + amount;
+		})
 
-		this.#departures.map(({id, amount, price}) => {
+		this.#departures.forEach(({id, amount, price}) => {
 			let stat = this.#statisticList[id - 201];
 			stat.departuresAmount = stat.departuresAmount + amount * this.#productsBase[id - 201].pack;
 			stat.totalCost = stat.totalCost + price * amount * this.#productsBase[id - 201].pack;
@@ -114,7 +79,7 @@ class Store { // склад
 			
 		})
 
-		this.#scrappedProducts.map(({id, amount, sum}) => {
+		this.#scrappedProducts.forEach(({id, amount, sum}) => {
 			let stat = this.#statisticList[id - 201];
 			stat.totalLosses = stat.totalLosses + sum;
 			stat.lossesAmount = stat.lossesAmount + amount * this.#productsBase[id - 201].pack;
@@ -123,33 +88,22 @@ class Store { // склад
 
 	#updateExpiryDate = () => { // обновить значение срока годности продукта 
 		this.#products = this.#products.map(
-			product => ({
-				...product,
-				expiryDate: product.expiryDate - 1
-			})
-		)
-	}
+			item => new StoreProduct({...item, expiryDate: item.expiryDate - 1})
+		);
+	};
 
 	#writeOf = () => { // удаление просрочки
 		this.#scrappedProducts = this.#products.filter(product => product.expiryDate == 0).map(({id, amount, initialPrice, pack}) => ({id, amount,initialPrice, sum: pack * amount * initialPrice}));
-
 		this.#products = this.#products.filter(product => product.expiryDate > 0);
 	}
 
 	#margin = () => { // уценка, каждый день меньше 3 маржа уменьшается
-		this.#products = this.#products.map(product => {
-			if(product.expiryDate < 3) {
-				let {initialPrice} = this.#productsBase[product.id - 201];
-				let margin = product.expiryDate * 10 - 10;
-				return(
-					{
-						...product,
-						margin,
-						price: Math.round(initialPrice * (1 + margin / 100))
-					}
-				)
+		this.#products = this.#products.map(item => {
+			if(item.expiryDate < 3) {
+				let margin = Math.min(item.expiryDate * 10 - 10, item.margin);
+				return(new StoreProduct({...item, margin}))
 			} else {
-				return(product);
+				return(item);
 			}
 		});
 	}
@@ -173,20 +127,7 @@ class Store { // склад
 			return(1);
 		});
 	}
-
-	#getList = (parent) => {
-		return parent.reduce((res, item) => { // список заявок на поставки
-			const newOrders = item.order.map(
-				order => ({
-					id: order.id,
-					retailer: item.retailer.getId(),
-					amount: order.amount,
-				})
-			)
-			return([...res, ...newOrders])
-		}, []) 
-	}	
-
+	
 	#calcProductAmount = (id) => this.#findProductbyId(id).reduce((res, {amount}) => res + amount, 0);
 
 	#complianceMin = () => { // поддержание минимального кол-ва продукции
@@ -196,9 +137,9 @@ class Store { // склад
 			const expectedAmount = this.#calcExpectedAmount(id);
 			
 			if(dev > 0) { // кол-во товара меньше установленного минимума
-				const orderAmount = Math.min(dev, limit - expectedAmount);
-				if(orderAmount > 0) {
-					this.#providerOrders = [...this.#providerOrders, new Order(id, orderAmount)];
+				const amount = Math.min(dev, limit - expectedAmount);
+				if(amount > 0) {
+					this.#providerOrders = [...this.#providerOrders, new Order({id, amount})];
 				}
 			}
 		})
@@ -211,10 +152,10 @@ class Store { // склад
 			expectedAmount = this.#calcExpectedAmount(order.id);
 			this.#expectedDeliveries = [
 				...this.#expectedDeliveries.filter(item => item.id != order.id),
-				{
-					id: order.id, 
+				new Order({
+					...order,
 					amount: expectedAmount + order.amount
-				}
+				})
 			]
 		});
 	}
@@ -228,29 +169,31 @@ class Store { // склад
 		return list.filter((item,index) => i != index);
 	}
 
-	#tryStore = (order, retailer) => {
-		const {id, amount} = order;   
+	#tryStore = (retailerOrder) => {
+		
+		const {id, retailerId} = retailerOrder; 
+		let {amount} = retailerOrder;
+
 		let roundAmount = Math.max(Math.round(amount / this.#productsBase[id - 201].pack), 1); 
 		this.#products = this.#products.map((item, index) => {
 			if(item.id == id && roundAmount > 0 && item.amount > 0) {
 				if(roundAmount >= item.amount) {
 					this.#departures = [...this.#departures, {
-						id: order.id,
-						retailer: retailer,
+						id,
+						retailer: retailerId,
 						amount: item.amount,
 						price: item.price,
 						from: index
 					}]
 
 					roundAmount = roundAmount - item.amount
-					return({ // полностью отправили какую-то партию товара покупателю
-						...item,
-						amount: 0
-					})
+					return( // полностью отправили какую-то партию товара покупателю
+						new StoreProduct({...item, amount: 0})
+					)
 				} else {
 					this.#departures = [...this.#departures, {
-						id: order.id,
-						retailer: retailer,
+						id,
+						retailer: retailerId,
 						amount: roundAmount,
 						price: item.price,
 						from: index
@@ -259,10 +202,9 @@ class Store { // склад
 					let newAmount = item.amount - roundAmount;
 					roundAmount = 0;
 
-					return({
-						...item,
-						amount: newAmount
-					})
+					return(
+						new StoreProduct({...item, amount: newAmount})
+					)
 				}
 			} else {
 				return item;
@@ -281,53 +223,39 @@ class Store { // склад
 		this.#makeProviderOrder();       		 // дозаказываем продукты от фирм поставщика по вчерашней заявке
 		this.#providerOrders = [];       		 // сбрасываем дозаказываем продуктов от фирм поставщиков
 		this.#morningPropucts = this.#products;  // обновляем отображаемое состояние склада на начало дня
-		this.#orderList = [];                    // сбрасываем заказы от торговых точек
+		this.#retailerOrderList = [];                    // сбрасываем заказы от торговых точек
 		updateShortUI(this);                     // обновляем упрощенный интерфейс
 	}
 
 	processOrders = () => {
-		this.#morningOrders = this.#orderList;   // обновляем отображаемые заказы от торговых точек
+		this.#morningOrders = this.#retailerOrderList;   // обновляем отображаемые заказы от торговых точек
 		this.#departures = [];                   // сбрасываем отправления торговым точкам
-
 		this.#statisticList = db.products.map(item => new StatisticItem(item.id)); // сбрасываем статистику
-		
-		this.#orderList.map(orderListItem => { // проходимся по списку заказов и отправляем все что можем
-			orderListItem.order.map(order => {
-				this.#tryStore(order, orderListItem.retailer.getId());
-			});
-		});
-
-		this.#updateExpiryDate(); // обновление срока годности
-		this.#collectStatistic(); // сбор статистики
-		this.#margin(); 		  // автоматическая уценка
-		this.#complianceMin();    // поддержание минимального кол-ва товара на складе
-		this.#orderList = [];     // сброс списка заказов
-		updateUI(this);           // обновление интерфейса
+		this.#retailerOrderList.forEach(retailerOrder => this.#tryStore(retailerOrder)); // проходимся по списку заказов и отправляем все что можем
+		this.#updateExpiryDate();         // обновление срока годности
+		this.#collectStatistic();         // сбор статистики
+		this.#margin(); 		          // автоматическая уценка
+		this.#complianceMin();            // поддержание минимального кол-ва товара на складе
+		this.#retailerOrderList = [];     // сброс списка заказов
+		updateUI(this);                   // обновление интерфейса
 	}
 
 	acceptOrder = (order) => { // принять заказ от поставщика
-		const {id, initialPrice, expiryDate, margin, pack} = this.#productsBase[order.id - 201];
-
 		this.#products = [
 			...this.#products,
-			{
-				id,
-				amount: order.amount,
-				pack,
-				expiryDate,
-				initialPrice,
-				margin,
-				price: Math.round(initialPrice * (1 + margin / 100))
-			}
+			new StoreProduct({
+				...this.#productsBase[order.id - 201],
+				...order
+			})
 		]
 
 		this.#expectedDeliveries = this.#expectedDeliveries.map(item => {
-			return item.id == id ? {...item, amount: item.amount - order.amount} : item;
+			return item.id == order.id ?  new Order({...item, amount: item.amount - order.amount}) : item;
 		}).filter(item => item.amount > 0);
 	}
 
-	newOrder = (retailer, order) => { // принять заявку на заказ потребителя
-		this.#orderList = [...this.#orderList, {retailer: retailer, order: order}];
+	newOrder = (retailerOrder) => { // принять заявку на заказ потребителя
+		this.#retailerOrderList = [...this.#retailerOrderList, retailerOrder];
 	} 
 
 	removeProviderOrder = (i) => {
@@ -347,17 +275,15 @@ class Store { // склад
 	}
 
 	setMargin = (i, value) => {		
-		this.#morningPropucts[i] = {
+		this.#morningPropucts[i] = new StoreProduct({
 			...this.#morningPropucts[i],
 			margin: value,
-			price: Math.round(this.#morningPropucts[i].initialPrice * (1 + value / 100))
-		}
+		})
 
-		this.#products[i] = {
+		this.#products[i] = new StoreProduct({
 			...this.#products[i],
 			margin: value,
-			price: Math.round(this.#products[i].initialPrice * (1 + value / 100))
-		}
+		})
 
 		updateShortUI(this);
 	}	
@@ -369,19 +295,25 @@ class Store { // склад
 	getShortStat = () => {  // получить краткую статистику по дню
 		const profit = this.#statisticList.reduce((res, {profitCost}) => res + profitCost, 0);
 		const losses = this.#statisticList.reduce((res, {totalLosses}) => res + totalLosses, 0);
-		return(
-			[{
-				volume: this.#statisticList.reduce((res, {totalCost}) => res + totalCost, 0),
-				profit,
-				losses, 
-				result: profit - losses 
-			}]
-		)
+		const volume = this.#statisticList.reduce((res, {totalCost}) => res + totalCost, 0);
+
+		
+		return [new ShortStatisticItem({volume, losses, profit})];
 	}
 
-	getProducts = () => this.#morningPropucts;               // получить продукты к началу дня
+	getProducts = () => {;               // получить продукты к началу дня
+		return this.#morningPropucts.map(({id,amount, pack, expiryDate, initialPrice, margin, price}) => (
+				{id,amount, pack, expiryDate, initialPrice, margin, price}
+			));
+	} 
+
 	getScrappedProducts = () => this.#scrappedProducts;      // получить списанные продукты
-	getOrderList = () => this.#getList(this.#morningOrders); // получить список заказов от торговых точек
+	
+	getOrderList = () => {	                                 // получить список заказов от торговых точек
+		return this.#morningOrders.map(({id, retailerId, amount}) => (
+			{id, retailerId, amount}
+		));
+	}
 	getDepartures = () => this.#departures.map(({id,retailer,amount, price}) => ({id,retailer,amount,price})); // получить список перевозок
 	getProviderOrders = () => this.#providerOrders;          // получить список заказов фирме поставщику
 	getExpectedDeliveries = () => this.#expectedDeliveries.sort((a,b) => (a.id - b.id)); // получить список ожидаемых поставок от фирмы поставщика

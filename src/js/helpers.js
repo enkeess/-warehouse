@@ -44,12 +44,16 @@ const withSpan = (text) => {
 	return span;
 }
 
-const addOptions = (parent, min, max) => {
+const addOptions = (parent, min, max, value) => {
 	for(let i = min; i <= max; i++) {
 		parent.append(withOption(i));
 	}
 
-	parent.value = max;
+	if(value) {
+		parent.value = value
+	} else {
+		parent.value = max;
+	}
 }
 
 const withOption = (value) => {

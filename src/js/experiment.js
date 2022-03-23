@@ -1,19 +1,20 @@
-class Tester {
+class Experiment {
 //  ----- Private Var ----- //
 	#store;    				// экземпляр класса склада
 	#provider; 				// фирма поставщик
-	#retailers;             // торговые точки
 	#currentDay;            // счетчик текущего дня эксперимента
 	#db;                    // данные о товарах
-	#days;                  // кол-во дней моделирования
-	#retailersAmount;       // кол-во торговых точек
-	#productsAmount;        // кол-во видов продуктов
 	#history;               // история по дням
 	#result;                // итоги эксперимента
+	#days;                  // кол-во дней моделирования
+	#retailersAmount;       // кол-во торговых точек
+	#minOrder;              // минимальный заказ торговой точки
+	#maxOrder;              // максимальный заказ торговой точки
+
 //  ----- Private Var ----- //
 
 //  ----- Constructor ----- //
-	constructor(db, days, retailersAmount, productsAmount) {
+	constructor({db, days, retailersAmount, productsAmount, minOrder, maxOrder, minDispatchTime, maxDispatchTime}) {
 		const newDb = {
 			products: db.products.filter(item => item.id <= 200 + productsAmount).sort((a,b) => a.id - b.id),
 			config: db.config.filter(item => item.id <= 200 + productsAmount),
@@ -21,26 +22,23 @@ class Tester {
 		}
 
 		this.#db = newDb;
-		this.#provider = new Provider();
+		this.#provider = new Provider({minDispatchTime, maxDispatchTime});
 		this.#store = new Store(this.#db, this.#provider);
 		this.#days = days;
 		this.#retailersAmount = retailersAmount; 
 		this.#productsAmount = productsAmount;
+		this.#minOrder = minOrder;
+		this.#maxOrder = maxOrder;
 		this.#currentDay = 0;
 		this.#history = [];
 		
 		this.#result = {
-			stat: newDb.products.map((item) => new StatisticItem(item.id)), 
-			short: [{
-				volume: 0,
-				profit : 0,
-				losses: 0, 
-				result: 0
-			}]
+			stat: newDb.products.map((item) => new StatisticItem({id: item.id})), 
+			short: [
+				new ShortStatisticItem({volume: 0})
+			]
 		};
-		
-		this.#retailers = new Array(retailersAmount).fill(0).map((item, i) => new Retailer({provider:this.#store, id: 101 + i}));
-		
+
 		nextBtn.classList.remove('hide');
 		this.nextStep();
 	}
@@ -48,13 +46,16 @@ class Tester {
 
 // Private
 	#generateOrders = () => {
-		const retailersIndex = getRandomArray(0, this.#retailersAmount - 1, getRandomInt(1, this.#retailersAmount));   // генерируем точки которые будут совершать заказ
-		retailersIndex.forEach(index => {
-			const orderList = getRandomArray(201, 200 + this.#productsAmount, getRandomInt(1, this.#productsAmount)).map(
-				id => new Order(id, getRandomInt(10, 300))
-			);
-
-			this.#retailers[index].makeOrder(orderList);
+		const retailersIndex = getRandomArray(101, 100 + this.#retailersAmount, getRandomInt(1, this.#retailersAmount)); // генерируем точки которые будут совершать заказ
+		
+		const products = this.#store.getProducts().map(({id, margin}) => ({id, chance: 0.5 + (20 - margin) * 0.0125}));
+		retailersIndex.forEach(retailerId => {
+			products.forEach(({id,chance}) => {
+				if(Math.random() <= chance) {
+					let amount = getRandomInt(this.#minOrder, this.#maxOrder);
+					this.#store.newOrder(new RetailerOrder({id: id, amount: amount, retailerId: retailerId}))
+				}
+			})
 		})
 	}
 

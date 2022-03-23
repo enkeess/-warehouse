@@ -21,24 +21,56 @@
     <main> 
 		<h1>Склад</h1>		
 		<div class="setup">
-			<form id="form" class="block">
-				<h2>Настройка параметров моделирования</h2>
-
-				<label for="retailersAmount">Кол-во торговых точек</label>
-				<select id="retailersAmount" name="retailersAmount"></select>
-				
-				<label for="productsAmount">Кол-во продуктовых товаров</label>
-				<select id="productsAmount" name="productsAmount"></select>
-				
+			<div class="flex">
+				<form id="form" class="block">
+					<h2>Настройка параметров моделирования</h2>
+					<div class="flex">
+					
+						<label for="retailersAmount">Кол-во торговых точек:
+							<select id="retailersAmount" name="retailersAmount"></select>
+						</label>
+						
+						<label for="productsAmount">Кол-во продуктовых товаров:
+							<select id="productsAmount" name="productsAmount"></select>
+						</label>
+						
+						<label for="days">Кол-во дней моделирования:
+							<select id="days" name="days"></select>
+						</label>
+					
+						<label for="config">Файл конфигурации:
+							<input name="config" type="file" required></input>
+						</label>
+						
+						
+					</div>
 		
-				<label for="days">Кол-во дней моделирования</label>
-				<select id="days" name="days"></select>
-				
-				<label for="config">Файл конфигурации:</label>
-				<input name="config" type="file" required></input>
-				
-				<button id="start" class="btn"> Начать новый эксперимент </button>
-			</form>
+					<div class="flex">
+						<label for="minOrder">Минимальный заказ
+							<select id="minOrder" name="minOrder"></select>
+						</label>
+						
+						<label for="maxOrder">Максимальный заказ
+							<select id="maxOrder" name="maxOrder"></select>
+						</label>
+						
+						<label for="minDispatchTime">Минимальное время отправки фирмой поставщиком
+							<select id="minDispatchTime" name="minDispatchTime"></select>
+						</label>
+						
+						<label for="maxDispatchTime">Максимальное время отправки фирмой поставщиком
+							<select id="maxDispatchTime" name="maxDispatchTime"></select>
+						</label>
+					</div>
+				</form>
+
+				<div class="block">
+					<div class="flex flex_cc">
+						<button form="form" id="start" class="btn btn_huge"> Начать новый эксперимент </button>
+					</div>
+				</div>
+			</div>
+			
 		</div>
 
 		<div id="experiment" class="hide">
@@ -122,5 +154,5 @@
 	</main>
 </body>
 
-<script type="module" src="./js/scripts.js"></script>
+<script type="module" src="./js/scripts.min.js"></script>
 </html>

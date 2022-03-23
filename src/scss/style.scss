@@ -6,7 +6,6 @@
 body {
   padding: 10px;
   position: relative;
-  padding-bottom: 80px;
 }
 
 .flex {
@@ -17,6 +16,15 @@ body {
     align-items: center;
     justify-content: flex-end;
   }
+}
+
+label {
+  font-size: 14px;
+  margin-right: 5px;
+  border: solid 1px gray;
+  border-radius: 5px;
+  padding: 5px;
+  margin-bottom: 10px;
 }
 
 .manage-panel {
@@ -38,6 +46,7 @@ body {
   padding: 10px;
   border-radius: 4px;
   text-align: center;
+  transition: all 0.3s;
   &_del {
     border-radius: 0;
     background-color: pink;
@@ -60,6 +69,18 @@ body {
     &::after {
       transform: translateY(-50%) rotateZ(-45deg);
     }
+  }
+  &_huge {
+    height: 100px;
+    font-size: 18px;
+  }
+
+  &:hover {
+    background-color: #e5e5e5;
+  }
+  &:focus {
+    background-color: #18aaaa;
+    color: white;
   }
 }
 

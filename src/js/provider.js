@@ -1,12 +1,20 @@
 class Provider {
-	#orderList = [];
+	#orderList;
+	#minDispatchTime;
+	#maxDispatchTime;
+
+	constructor({minDispatchTime, maxDispatchTime}) {
+		this.#orderList = []
+		this.#minDispatchTime = minDispatchTime;
+		this.#maxDispatchTime = maxDispatchTime
+	}
 
 	newOrder = (order) => {
 		this.#orderList = [ 
 			...this.#orderList,  
 			{
 				order: order, 
-				leadTime: getRandomInt(1, 5)
+				leadTime: getRandomInt(this.#minDispatchTime, this.#maxDispatchTime)
 			}
 		];
 	}

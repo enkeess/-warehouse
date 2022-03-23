@@ -1,6 +1,6 @@
 nextBtn.classList.add('hide');
 nextBtn.addEventListener('click', ()=>{
-	tester.nextStep();
+	ex.nextStep();
 })
 
 form.config.addEventListener('change', (e) => readFile(e.target));
@@ -14,21 +14,41 @@ form.addEventListener('submit', (e) => {
 	days = +form.days.value;
 	productsAmount = +form.productsAmount.value;
 	retailersAmount = +form.retailersAmount.value;
+	minOrder = +form.minOrder.value;
+	maxOrder = +form.maxOrder.value;
 
-	tester = new Tester(db, days, retailersAmount, productsAmount);
+	
+	minDispatchTime = +form.minDispatchTime.value;
+	maxDispatchTime = +form.maxDispatchTime.value;
+
+	if(minDispatchTime > maxDispatchTime) {
+		maxDispatchTime = minDispatchTime;
+		form.maxDispatchTime.value = minDispatchTime;
+	}
+
+	ex = new Experiment({	
+		db, 
+		days, 
+		retailersAmount, 
+		productsAmount, 
+		minOrder,
+		maxOrder,
+		minDispatchTime,
+		maxDispatchTime
+	});
 });
 
 getOrdersBtn.addEventListener('click', () => {
-	tester.makeOrders();
+	ex.makeOrders();
 })
 
 resultsBtn.addEventListener('click', () => {
 	experiment.classList.add('hide');
 	results.classList.remove('hide');
 	
-	tester.updateHistory();
-	tester.calcResult();
+	ex.updateHistory();
+	ex.calcResult();
 	
-	drawHistory(historyResult, tester.getResult())
-	drawHistory(historyByDay, tester.getHistory());
+	drawHistory(historyResult, ex.getResult())
+	drawHistory(historyByDay, ex.getHistory());
 })
