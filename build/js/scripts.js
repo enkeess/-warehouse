@@ -9,27 +9,30 @@ let minDispatchTime = 0;
 let maxDispatchTime = 0;
 let db = {};
 let ex = null;
+let slider = null;
 
 
 class Product {
 	id;
-	constructor({id}) {
+	title;
+	constructor({id, title}) {
 		this.id = id;
+		this.title = title;
 	}
 }
 
 class Order extends Product {
 	amount;
-	constructor({id, amount}) {
-		super({id});
+	constructor({id, title, amount}) {
+		super({id, title});
 		this.amount = amount;
 	}
 }
 
 class ProviderOrder extends Order {
 	leadtime;
-	constructor({id, amount, leadtime}) {
-		super({id, amount});
+	constructor({id, title, amount, leadtime}) {
+		super({id, title, amount});
 		this.leadtime = leadtime;
 	}
 }
@@ -39,8 +42,8 @@ class DbProduct extends Product {
 	pack;
 	expiryDate;
 
-	constructor({id, initialPrice, pack, expiryDate}) {
-		super({id});
+	constructor({id, initialPrice, pack, expiryDate, title}) {
+		super({id, title});
 		this.initialPrice = initialPrice;
 		this.pack = pack;
 		this.expiryDate = expiryDate;
@@ -51,8 +54,8 @@ class StoreProduct extends DbProduct {
 	margin;
 	amount;
 	price;
-	constructor({id, initialPrice, pack, expiryDate, margin, amount}) {
-		super({id, initialPrice, pack, expiryDate});
+	constructor({id, initialPrice, pack, expiryDate, margin, amount, title}) {
+		super({id, initialPrice, pack, expiryDate, title});
 		this.margin = margin;
 		this.amount = amount;
 		this.price = Math.round((1 + this.margin / 100) * initialPrice);
@@ -61,8 +64,8 @@ class StoreProduct extends DbProduct {
 
 class RetailerOrder extends Order {
 	retailerId;
-	constructor({id, amount, retailerId}) {
-		super({id, amount});
+	constructor({id, amount, retailerId, title}) {
+		super({id, amount, title});
 		this.retailerId = retailerId;
 	}
 }
@@ -70,8 +73,8 @@ class RetailerOrder extends Order {
 class Departure extends RetailerOrder {
 	price;
 	from;
-	constructor({id, amount, retailerId, price, from}) {
-		super({id, amount, retailerId});
+	constructor({id, amount, retailerId, price, from, title}) {
+		super({id, amount, retailerId, title});
 		this.price = price;
 		this.from = from;
 	}
@@ -80,6 +83,7 @@ class Departure extends RetailerOrder {
 
 class StatisticItem {
 	id;               // код товара
+	title;            // наименование товара
 	orderAmount;      // объем заявок на поставки
 	departuresAmount; // объем отгруженных заявок
 	lossesAmount;     // объем списанных товаров
@@ -88,7 +92,8 @@ class StatisticItem {
 	totalLosses;      // общая потеря от списывания
 	
 	constructor({
-		id, 
+		id,
+		title,
 		orderAmount = 0, 
 		departuresAmount = 0, 
 		lossesAmount = 0, 
@@ -96,6 +101,7 @@ class StatisticItem {
 		profitCost = 0 
 	}) {
 		this.id = id;
+		this.title = title;
 		this.orderAmount = orderAmount;
 		this.departuresAmount = departuresAmount;
 		this.lossesAmount = lossesAmount;
@@ -121,7 +127,8 @@ class ShortStatisticItem {
 		this.losses = losses;
 		this.result = this.profit - this.losses;
 	}
-};
+}
+;
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
   max = Math.floor(max + 1);
@@ -201,6 +208,8 @@ const withSelector = (value, action, index, min = -20, max = 20) => {
 const nextBtn = document.querySelector('#next');
 const resultsBtn = document.querySelector('#resultsBtn');
 const counter = document.querySelector('.counter');
+const rebootBtn = document.querySelector('#reboot');
+const toEndBtn = document.querySelector('#to-end');
 
 const getOrdersBtn = document.querySelector('#get-orders');
 const details = document.querySelector('#details');
@@ -208,9 +217,12 @@ const details = document.querySelector('#details');
 const experiment = document.querySelector('#experiment');
 const results = document.querySelector('#results');
 
+const setup = document.querySelector('#setup');
+
+
 const warehouseList = document.querySelector('#warehouse-list');
 const warehouseTopList = [
-	'Код товара',
+	'Название',
 	'Кол-во упаковок',
 	'Кол-во единиц в упаковке',
 	'Срок годности (дней) ',
@@ -221,7 +233,7 @@ const warehouseTopList = [
 
 const scrappedList = document.querySelector('#scrapped-list')
 const scrappedTopList = [
-	'Код товара',
+	'Название',
 	'Кол-во единиц товара',
 	'Закупочная цена за единицу (у.е)',
 	'Общая стоимость'
@@ -229,14 +241,14 @@ const scrappedTopList = [
 
 const ordersList = document.querySelector('#orders-list');
 const orderTopList = [
-	'Код товара',
+	'Название',
 	'Торговая точка',
 	'Кол-во единиц товара'
 ]
 
 const departuresList = document.querySelector('#departures-list');
 const departuresTopList = [
-	'Код товара',
+	'Название',
 	'Торговая точка',
 	'Кол-во упаковок',
 	'Цена за единицу (у.е)'
@@ -244,7 +256,7 @@ const departuresTopList = [
 
 const expectedList = document.querySelector('#expected-list');
 const expectedTopList = [
-	'Код товара',
+	'Название',
 	'Кол-во упаковок'
 ]
 
@@ -252,10 +264,10 @@ const providerOrders = document.querySelector('#provider-orders')
 
 const statList = document.querySelector('#stat-list');
 const statTopList = [
-	'Объем продаж: ',
-	'Чистая прибыль: ',
-	'Потери при списании: ',
-	'Итог: '
+	'Объем продаж (у.е.): ',
+	'Чистая прибыль (у.е.): ',
+	'Потери при списании (у.е.): ',
+	'Итог (у.е.): '
 ]
 
 const historyByDay = document.querySelector('#historyByDay');
@@ -267,7 +279,7 @@ const historyStat = document.querySelector('.history__stat');
 const historyWrapper = document.querySelector('.history__wrapper');
 
 const historyTopItem = [
-	'Код товара',
+	'Название',
 	'Объем заявок единиц товара',
 	'Объем отгруженных единиц товара',
 	'Списано единиц товара',
@@ -308,7 +320,7 @@ const drawTable = (parent, top, data, action) => {
 		for(let key in node) {
 			if(key == 'margin' && action && action.modify) {
 				tableRow.append(withSelector(node[key], action.modify, i));
-			} else {
+			} else if(key != 'id') {
 				tableRow.append(withSpan(node[key]));
 			}
 		}
@@ -380,6 +392,62 @@ const drawHistory = (parent, data) => {
 	})
 }
 
+const nextSlideBtn = document.querySelector('#next-slide');
+const prevSlideBtn = document.querySelector('#prev-slide');
+
+class Slider {
+	constructor(container, wrapper, nextSlideBtn, prevSlideBtn) {
+		console.log('new slider');
+
+
+		this.wrapper = wrapper;
+		this.container = container;
+
+		wrapper.style.left = "";
+
+		nextSlideBtn.classList.remove('hide');
+
+		this.shift = 0;
+		this.containerWidth = container.clientWidth;
+		this.wrapperWidth = wrapper.scrollWidth;
+
+		prevSlideBtn.classList.add('hide');
+
+		if(-(this.shift - this.containerWidth) >= this.wrapperWidth) {
+			nextSlideBtn.classList.add('hide');
+		}
+
+		nextSlideBtn.addEventListener('click', this.nextClideAction);
+		prevSlideBtn.addEventListener('click', this.prevSlideAction);
+	}
+
+	nextClideAction = () => {
+		prevSlideBtn.classList.remove('hide');
+		this.shift = this.shift - this.containerWidth;
+		this.wrapper.style.left = `${this.shift}px`;
+		
+		if(-(this.shift - this.containerWidth) >= this.wrapperWidth) {
+			nextSlideBtn.classList.add('hide');
+		}
+	}
+
+	prevSlideAction = () => {
+		nextSlideBtn.classList.remove('hide');
+		this.shift = this.shift + this.containerWidth;
+		this.wrapper.style.left = `${this.shift}px`;
+
+		if(this.shift == 0) {
+			prevSlideBtn.classList.add('hide');
+		}
+	}
+
+	removeActions = () => {
+		nextSlideBtn.removeEventListener('click', this.nextClideAction);
+		prevSlideBtn.removeEventListener('click', this.prevSlideAction);
+	}
+}
+
+
 ;
 class Provider {
 	#orderList;
@@ -418,7 +486,6 @@ class Store { // склад
 
 //  ----- Private Var ----- //
 	#productsBase;          // бд продуктов
-	#config;                // конфигурация склада
 	#provider;              // поставщик
 	#statisticList;         // статистика продаж по продуктам
 	#products;              // текущий список продуктов после отправки заказчикам
@@ -434,7 +501,6 @@ class Store { // склад
 //  ----- Constructor ----- //
 	constructor(db, provider) {
 		this.#productsBase = db.products;
-		this.#config = db.config;
 		this.#provider = provider;
 
 		this.#products = db.initialStore.map(product => {
@@ -449,7 +515,7 @@ class Store { // склад
 
 		this.#morningPropucts = this.#products;
 		this.#morningOrders   = this.#retailerOrderList;
-		this.#statisticList   = this.#productsBase.map(item => new StatisticItem({id:item.id}));
+		this.#statisticList   = this.#productsBase.map(({id, title}) => new StatisticItem({id, title}));
 
 		console.log(this.#productsBase);
 	}
@@ -480,7 +546,7 @@ class Store { // склад
 //  ----- Private ----- //
 
 	#collectStatistic = () => { // собрать статистику по дню
-		this.#statisticList = this.#productsBase.map(item => new StatisticItem({id: item.id}));
+		this.#statisticList = this.#productsBase.map(({id, title}) => new StatisticItem({id, title}));
 
 		this.#morningOrders.forEach(({id, amount}) => {
 			let stat = this.#statisticList[id - 201];
@@ -534,7 +600,7 @@ class Store { // склад
 
 	#sortProducts = () => {
 		this.#products.sort((a, b) => { 
-			if(a.id < b.id) {
+			if(a.title < b.title) {
 				return(-1);
 			} 
 			if(a.id == b.id) {
@@ -547,15 +613,16 @@ class Store { // склад
 	#calcProductAmount = (id) => this.#findProductbyId(id).reduce((res, {amount}) => res + amount, 0);
 
 	#complianceMin = () => { // поддержание минимального кол-ва продукции
-		this.#config.map(({id, min, limit}) => {
+		this.#productsBase.map(({id, min, limit}) => {
 			const curAmount = this.#calcProductAmount(id);
 			const dev = min - curAmount;
 			const expectedAmount = this.#calcExpectedAmount(id);
 			
 			if(dev > 0) { // кол-во товара меньше установленного минимума
+				const {title} = this.#productsBase[id - 201];
 				const amount = Math.min(dev, limit - expectedAmount);
 				if(amount > 0) {
-					this.#providerOrders = [...this.#providerOrders, new Order({id, amount})];
+					this.#providerOrders = [...this.#providerOrders, new Order({id, amount, title})];
 				}
 			}
 		})
@@ -582,38 +649,46 @@ class Store { // склад
 	};	
 
 	#removeFromList = (list, i) => {
-		return list.filter((item,index) => i != index);
+		return list.filter((item, index) => i != index);
 	}
 
 	#tryStore = (retailerOrder) => {
 		
-		const {id, retailerId} = retailerOrder; 
+		const {id, retailerId, title} = retailerOrder; 
 		let {amount} = retailerOrder;
 
 		let roundAmount = Math.max(Math.round(amount / this.#productsBase[id - 201].pack), 1); 
-		this.#products = this.#products.map((item, index) => {
+		this.#products = this.#products.map((item, from) => {
 			if(item.id == id && roundAmount > 0 && item.amount > 0) {
 				if(roundAmount >= item.amount) {
-					this.#departures = [...this.#departures, {
-						id,
-						retailer: retailerId,
-						amount: item.amount,
-						price: item.price,
-						from: index
-					}]
+					this.#departures = [
+						...this.#departures,
+						new Departure({
+							id,
+							retailerId,
+							amount: roundAmount,
+							price: item.price,
+							from, 
+							title
+						})
+					]
 
 					roundAmount = roundAmount - item.amount
 					return( // полностью отправили какую-то партию товара покупателю
 						new StoreProduct({...item, amount: 0})
 					)
 				} else {
-					this.#departures = [...this.#departures, {
-						id,
-						retailer: retailerId,
-						amount: roundAmount,
-						price: item.price,
-						from: index
-					}]
+					this.#departures = [
+						...this.#departures,
+						new Departure({
+							id,
+							retailerId,
+							amount: roundAmount,
+							price: item.price,
+							from,
+							title
+						})
+					]
 					
 					let newAmount = item.amount - roundAmount;
 					roundAmount = 0;
@@ -713,24 +788,23 @@ class Store { // склад
 		const losses = this.#statisticList.reduce((res, {totalLosses}) => res + totalLosses, 0);
 		const volume = this.#statisticList.reduce((res, {totalCost}) => res + totalCost, 0);
 
-		
 		return [new ShortStatisticItem({volume, losses, profit})];
 	}
 
 	getProducts = () => {;               // получить продукты к началу дня
-		return this.#morningPropucts.map(({id,amount, pack, expiryDate, initialPrice, margin, price}) => (
-				{id,amount, pack, expiryDate, initialPrice, margin, price}
+		return this.#morningPropucts.map(({id, title, amount, pack, expiryDate, initialPrice, margin, price}) => (
+				{id, title, amount, pack, expiryDate, initialPrice, margin, price}
 			));
 	} 
 
 	getScrappedProducts = () => this.#scrappedProducts;      // получить списанные продукты
 	
 	getOrderList = () => {	                                 // получить список заказов от торговых точек
-		return this.#morningOrders.map(({id, retailerId, amount}) => (
-			{id, retailerId, amount}
+		return this.#morningOrders.map(({id, title, retailerId, amount}) => (
+			{id, title, retailerId, amount}
 		));
 	}
-	getDepartures = () => this.#departures.map(({id,retailer,amount, price}) => ({id,retailer,amount,price})); // получить список перевозок
+	getDepartures = () => this.#departures.map(({id, title, retailerId, amount, price}) => ({id,title, retailerId, amount, price})); // получить список перевозок
 	getProviderOrders = () => this.#providerOrders;          // получить список заказов фирме поставщику
 	getExpectedDeliveries = () => this.#expectedDeliveries.sort((a,b) => (a.id - b.id)); // получить список ожидаемых поставок от фирмы поставщика
 //  ----- Getters ----- //
@@ -745,10 +819,8 @@ class Experiment {
 	#history;               // история по дням
 	#result;                // итоги эксперимента
 
-
 	#days;                  // кол-во дней моделирования
 	#retailersAmount;       // кол-во торговых точек
-	#productsAmount;        // кол-во видов продуктов
 	#minOrder;              // минимальный заказ торговой точки
 	#maxOrder;              // максимальный заказ торговой точки
 
@@ -758,7 +830,6 @@ class Experiment {
 	constructor({db, days, retailersAmount, productsAmount, minOrder, maxOrder, minDispatchTime, maxDispatchTime}) {
 		const newDb = {
 			products: db.products.filter(item => item.id <= 200 + productsAmount).sort((a,b) => a.id - b.id),
-			config: db.config.filter(item => item.id <= 200 + productsAmount),
 			initialStore: db.initialStore.filter(item => item.id <= 200 + productsAmount)
 		}
 
@@ -767,14 +838,13 @@ class Experiment {
 		this.#store = new Store(this.#db, this.#provider);
 		this.#days = days;
 		this.#retailersAmount = retailersAmount; 
-		this.#productsAmount = productsAmount;
 		this.#minOrder = minOrder;
 		this.#maxOrder = maxOrder;
 		this.#currentDay = 0;
 		this.#history = [];
 		
 		this.#result = {
-			stat: newDb.products.map((item) => new StatisticItem({id: item.id})), 
+			stat: newDb.products.map(({id, title}) => new StatisticItem({id, title})), 
 			short: [
 				new ShortStatisticItem({volume: 0})
 			]
@@ -788,13 +858,24 @@ class Experiment {
 // Private
 	#generateOrders = () => {
 		const retailersIndex = getRandomArray(101, 100 + this.#retailersAmount, getRandomInt(1, this.#retailersAmount)); // генерируем точки которые будут совершать заказ
+		const products = this.#store.getProducts().map(({id, title, margin}) => ({id, title, margin}));
+		const testProducts = this.#db.products.map(({id, title}) => ({id, title, chance: 0}));
+
+		products.forEach(({id, margin}) => {
+			const i = id - 201;
+			const chanceCur = testProducts[i].chance;
+			const chanceCalc = 0.5 + (20 - margin) * 0.0125;
+			testProducts[i] = {
+				...testProducts[i],
+				chance: chanceCalc > chanceCur ? chanceCalc : chanceCur,
+			}
+		})
 		
-		const products = this.#store.getProducts().map(({id, margin}) => ({id, chance: 0.5 + (20 - margin) * 0.0125}));
 		retailersIndex.forEach(retailerId => {
-			products.forEach(({id,chance}) => {
+			testProducts.forEach(({id, title, chance}) => {
 				if(Math.random() <= chance) {
 					let amount = getRandomInt(this.#minOrder, this.#maxOrder);
-					this.#store.newOrder(new RetailerOrder({id: id, amount: amount, retailerId: retailerId}))
+					this.#store.newOrder(new RetailerOrder({id, title, amount, retailerId}))
 				}
 			})
 		})
@@ -810,7 +891,7 @@ class Experiment {
 		this.#store.newDay();
 		this.#currentDay = this.#currentDay + 1;
 
-		updateCounter(this.#currentDay, this.#days);	
+		updateCounter(this.#currentDay, this.#days);
 	}
 
 	makeOrders = () => {
@@ -838,6 +919,7 @@ class Experiment {
 			stat.forEach(item => {
 				const { 
 					id,
+					title,
 					orderAmount,
 					departuresAmount, 
 					lossesAmount, 
@@ -848,6 +930,7 @@ class Experiment {
 
 				this.#result.stat[item.id - 201] = {
 					id,
+					title,
 					orderAmount : orderAmount + item.orderAmount,
 					departuresAmount : departuresAmount + item.departuresAmount,
 					lossesAmount : lossesAmount + item.lossesAmount,
@@ -919,13 +1002,19 @@ form.addEventListener('submit', (e) => {
 		minDispatchTime,
 		maxDispatchTime
 	});
+
+	setup.classList.add('hide');
 });
 
 getOrdersBtn.addEventListener('click', () => {
 	ex.makeOrders();
 })
 
-resultsBtn.addEventListener('click', () => {
+const endOfExperement = () => {
+
+
+	slider && slider.removeActions();
+
 	experiment.classList.add('hide');
 	results.classList.remove('hide');
 	
@@ -934,5 +1023,35 @@ resultsBtn.addEventListener('click', () => {
 	
 	drawHistory(historyResult, ex.getResult())
 	drawHistory(historyByDay, ex.getHistory());
+
+	setup.classList.remove('hide');
+
+	slider = new Slider(
+		document.querySelector('.slider__container'),
+		document.querySelector('.slider__wrapper'),
+		document.querySelector('.next-slide-btn'),
+		document.querySelector('.prev-slide-btn'),
+	);
+}
+
+resultsBtn.addEventListener('click', endOfExperement);
+
+
+rebootBtn.addEventListener('click', () => {
+	experiment.classList.add('hide');
+	setup.classList.remove('hide');
 })
-;
+
+
+toEndBtn.addEventListener('click', () => {
+	if(nextBtn.classList.contains('hide')) {
+		ex.makeOrders();
+	}
+
+	while(resultsBtn.classList.contains('hide')) {
+		ex.nextStep();
+		ex.makeOrders();
+	}
+
+	endOfExperement();
+});

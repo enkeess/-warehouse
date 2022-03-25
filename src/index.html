@@ -20,7 +20,7 @@
 <body class="main__body">
     <main> 
 		<h1>Склад</h1>		
-		<div class="setup">
+		<div id="setup" class="setup">
 			<div class="flex">
 				<form id="form" class="block">
 					<h2>Настройка параметров моделирования</h2>
@@ -54,11 +54,11 @@
 							<select id="maxOrder" name="maxOrder"></select>
 						</label>
 						
-						<label for="minDispatchTime">Минимальное время отправки фирмой поставщиком
+						<label for="minDispatchTime">Минимальное время отправки фирмой-поставщиком
 							<select id="minDispatchTime" name="minDispatchTime"></select>
 						</label>
 						
-						<label for="maxDispatchTime">Максимальное время отправки фирмой поставщиком
+						<label for="maxDispatchTime">Максимальное время отправки фирмой-поставщиком
 							<select id="maxDispatchTime" name="maxDispatchTime"></select>
 						</label>
 					</div>
@@ -70,7 +70,6 @@
 					</div>
 				</div>
 			</div>
-			
 		</div>
 
 		<div id="experiment" class="hide">
@@ -115,44 +114,68 @@
 			</div>
 
 			<div class="manage-panel">
-				<div class="counter">
-					День эксперимента: 
-					<span id="currentDay">0</span>
-					/
-					<span id="allDays">0</span>
+
+				<div class="block reboot">
+					<button id="reboot" class="btn">Сбросить эксперимент</button>
 				</div>
 
-				<button id="get-orders" class="btn">Получить заявки</button>
-				<button id="next" class="btn next">Следующий день</button>
-				<button id="resultsBtn" class="btn hide"> Показать результаты эксперимента </button>
+				<div class="block flex">
+					<div class="counter">
+						День эксперимента:
+						<span id="currentDay">0</span>
+						/
+						<span id="allDays">0</span>
+					</div>
+					
+					<button id="get-orders" class="btn">Получить заявки</button>
+					<button id="next" class="btn next">Следующий день</button>
+					<button id="resultsBtn" class="btn hide"> Показать результаты эксперимента </button>
+				</div>
+				
+				<div class="block to-end">
+					<button id="to-end" class="btn">Провести эксперимент до конца</button>
+				</div>
+				
 			</div>
 		</div>
 
 		<div class="hide" id="results">
-			<h2>Результаты эксперимента</h2>
-			<div id="historyResult">
-				<div class="history__block block">
-					<h3 class="history__title">День</h3>
-					<div class="flex history__wrapper">
-						<ul class="history__item table"></ul>
-						<ul class="history__stat table table_tr"></ul>
+			<div class="block">
+				<h2>Результаты эксперимента</h2>
+				<div id="historyResult">
+					<div class="history__block block">
+						<h3 class="history__title">День</h3>
+						<div class="flex history__wrapper">
+							<ul class="history__item table"></ul>
+							<ul class="history__stat table table_tr"></ul>
+						</div>
 					</div>
 				</div>
 			</div>
-
-			<h2>Подбробная статистика эксперимента по дням</h2>
-			<div id="historyByDay">
-				<div class="history__block block">
-					<h3 class="history__title">День</h3>
-					<div class="flex history__wrapper">
-						<ul class="history__item table block"></ul>
-						<ul class="history__stat table table_tr block"></ul>
+			<div class="block">
+				<h2>Подбробная статистика эксперимента по дням</h2>
+				
+				<div class="slider">
+				
+					<div class="slider__container">
+						<div id="historyByDay" class="slider__wrapper">
+							<div class="history__block block">
+								<h3 class="history__title">День</h3>
+								<div class="flex history__wrapper">
+									<ul class="history__item table block"></ul>
+									<ul class="history__stat table table_tr block"></ul>
+								</div>
+							</div>
+						</div>
 					</div>
+				
+					<button class="btn slider__btn prev-slide-btn" id="prev-slide"> Предыдущий </button>
+					<button class="btn slider__btn next-slide-btn" id="next-slide"> Следующий </button>
 				</div>
 			</div>
 		</div>
 	</main>
 </body>
 
-<script type="module" src="./js/scripts.min.js"></script>
+<script type="module" src="./js/scripts.js"></script>
 </html>

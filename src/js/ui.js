@@ -1,6 +1,8 @@
 const nextBtn = document.querySelector('#next');
 const resultsBtn = document.querySelector('#resultsBtn');
 const counter = document.querySelector('.counter');
+const rebootBtn = document.querySelector('#reboot');
+const toEndBtn = document.querySelector('#to-end');
 
 const getOrdersBtn = document.querySelector('#get-orders');
 const details = document.querySelector('#details');
@@ -8,9 +10,12 @@ const details = document.querySelector('#details');
 const experiment = document.querySelector('#experiment');
 const results = document.querySelector('#results');
 
+const setup = document.querySelector('#setup');
+
+
 const warehouseList = document.querySelector('#warehouse-list');
 const warehouseTopList = [
-	'Код товара',
+	'Название',
 	'Кол-во упаковок',
 	'Кол-во единиц в упаковке',
 	'Срок годности (дней) ',
@@ -21,7 +26,7 @@ const warehouseTopList = [
 
 const scrappedList = document.querySelector('#scrapped-list')
 const scrappedTopList = [
-	'Код товара',
+	'Название',
 	'Кол-во единиц товара',
 	'Закупочная цена за единицу (у.е)',
 	'Общая стоимость'
@@ -29,14 +34,14 @@ const scrappedTopList = [
 
 const ordersList = document.querySelector('#orders-list');
 const orderTopList = [
-	'Код товара',
+	'Название',
 	'Торговая точка',
 	'Кол-во единиц товара'
 ]
 
 const departuresList = document.querySelector('#departures-list');
 const departuresTopList = [
-	'Код товара',
+	'Название',
 	'Торговая точка',
 	'Кол-во упаковок',
 	'Цена за единицу (у.е)'
@@ -44,7 +49,7 @@ const departuresTopList = [
 
 const expectedList = document.querySelector('#expected-list');
 const expectedTopList = [
-	'Код товара',
+	'Название',
 	'Кол-во упаковок'
 ]
 
@@ -52,10 +57,10 @@ const providerOrders = document.querySelector('#provider-orders')
 
 const statList = document.querySelector('#stat-list');
 const statTopList = [
-	'Объем продаж: ',
-	'Чистая прибыль: ',
-	'Потери при списании: ',
-	'Итог: '
+	'Объем продаж (у.е.): ',
+	'Чистая прибыль (у.е.): ',
+	'Потери при списании (у.е.): ',
+	'Итог (у.е.): '
 ]
 
 const historyByDay = document.querySelector('#historyByDay');
@@ -67,7 +72,7 @@ const historyStat = document.querySelector('.history__stat');
 const historyWrapper = document.querySelector('.history__wrapper');
 
 const historyTopItem = [
-	'Код товара',
+	'Название',
 	'Объем заявок единиц товара',
 	'Объем отгруженных единиц товара',
 	'Списано единиц товара',
@@ -108,7 +113,7 @@ const drawTable = (parent, top, data, action) => {
 		for(let key in node) {
 			if(key == 'margin' && action && action.modify) {
 				tableRow.append(withSelector(node[key], action.modify, i));
-			} else {
+			} else if(key != 'id') {
 				tableRow.append(withSpan(node[key]));
 			}
 		}
@@ -179,4 +184,60 @@ const drawHistory = (parent, data) => {
 		parent.append(newHistoryBlock);
 	})
 }
+
+const nextSlideBtn = document.querySelector('#next-slide');
+const prevSlideBtn = document.querySelector('#prev-slide');
+
+class Slider {
+	constructor(container, wrapper, nextSlideBtn, prevSlideBtn) {
+		console.log('new slider');
+
+
+		this.wrapper = wrapper;
+		this.container = container;
+
+		wrapper.style.left = "";
+
+		nextSlideBtn.classList.remove('hide');
+
+		this.shift = 0;
+		this.containerWidth = container.clientWidth;
+		this.wrapperWidth = wrapper.scrollWidth;
+
+		prevSlideBtn.classList.add('hide');
+
+		if(-(this.shift - this.containerWidth) >= this.wrapperWidth) {
+			nextSlideBtn.classList.add('hide');
+		}
+
+		nextSlideBtn.addEventListener('click', this.nextClideAction);
+		prevSlideBtn.addEventListener('click', this.prevSlideAction);
+	}
+
+	nextClideAction = () => {
+		prevSlideBtn.classList.remove('hide');
+		this.shift = this.shift - this.containerWidth;
+		this.wrapper.style.left = `${this.shift}px`;
+		
+		if(-(this.shift - this.containerWidth) >= this.wrapperWidth) {
+			nextSlideBtn.classList.add('hide');
+		}
+	}
+
+	prevSlideAction = () => {
+		nextSlideBtn.classList.remove('hide');
+		this.shift = this.shift + this.containerWidth;
+		this.wrapper.style.left = `${this.shift}px`;
+
+		if(this.shift == 0) {
+			prevSlideBtn.classList.add('hide');
+		}
+	}
+
+	removeActions = () => {
+		nextSlideBtn.removeEventListener('click', this.nextClideAction);
+		prevSlideBtn.removeEventListener('click', this.prevSlideAction);
+	}
+}
+
 

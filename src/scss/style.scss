@@ -1,17 +1,14 @@
-// Global SCSS-files imports
 @import "./reset";
 
-// Sections or Pages SCSS-files imports
-
 body {
-  padding: 10px;
   position: relative;
+  padding: 10px;
 }
 
 .flex {
   display: flex;
-  column-gap: 10px;
   justify-content: space-between;
+  column-gap: 10px;
   &_cc {
     align-items: center;
     justify-content: flex-end;
@@ -34,7 +31,7 @@ label {
   right: 0;
   z-index: 10;
 
-  background-color: #18aaaa;
+  background-color: #e6e6e6;
   padding: 5px 0;
   display: flex;
   align-items: center;
@@ -103,7 +100,7 @@ h2 {
 .table {
   border: solid 1px black;
   height: fit-content;
-  max-height: 210px;
+  max-height: 200px;
   overflow-y: scroll;
   position: relative;
   width: max-content;
@@ -116,8 +113,8 @@ h2 {
   &__item {
     span,
     select {
-      width: 6.5vw;
-      padding: 5px;
+      width: 6.75vw;
+      padding: 4px;
       border-right: solid 1px black;
       border-bottom: solid 1px black;
     }
@@ -182,8 +179,8 @@ h2 {
 }
 
 .block {
-  padding: 10px;
-  margin: 10px;
+  padding: 7px;
+  margin: 5px;
   border-radius: 10px;
   border: solid 1px black;
   width: fit-content;
@@ -262,4 +259,46 @@ h3 {
       }
     }
   }
+}
+
+.to-end {
+  position: absolute;
+  right: 30px;
+  top: 10px;
+}
+
+.reboot {
+  position: absolute;
+  left: 30px;
+  top: 10px;
+}
+
+.slider {
+  position: relative;
+  &__container {
+    overflow-x: hidden;
+    width: 1010px;
+    height: 270px;
+    position: relative;
+  }
+  &__wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    transition: all 0.5s ease-in-out;
+  }
+  &__btn {
+    position: absolute;
+    top: -37px;
+    right: 0;
+  }
+}
+
+.prev-slide-btn {
+  right: 100px;
+}
+
+.history__block {
+  width: 1000px;
 }

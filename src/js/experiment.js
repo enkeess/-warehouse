@@ -6,6 +6,7 @@ class Experiment {
 	#db;                    // данные о товарах
 	#history;               // история по дням
 	#result;                // итоги эксперимента
+
 	#days;                  // кол-во дней моделирования
 	#retailersAmount;       // кол-во торговых точек
 	#minOrder;              // минимальный заказ торговой точки
@@ -17,7 +18,6 @@ class Experiment {
 	constructor({db, days, retailersAmount, productsAmount, minOrder, maxOrder, minDispatchTime, maxDispatchTime}) {
 		const newDb = {
 			products: db.products.filter(item => item.id <= 200 + productsAmount).sort((a,b) => a.id - b.id),
-			config: db.config.filter(item => item.id <= 200 + productsAmount),
 			initialStore: db.initialStore.filter(item => item.id <= 200 + productsAmount)
 		}
 
@@ -26,14 +26,13 @@ class Experiment {
 		this.#store = new Store(this.#db, this.#provider);
 		this.#days = days;
 		this.#retailersAmount = retailersAmount; 
-		this.#productsAmount = productsAmount;
 		this.#minOrder = minOrder;
 		this.#maxOrder = maxOrder;
 		this.#currentDay = 0;
 		this.#history = [];
 		
 		this.#result = {
-			stat: newDb.products.map((item) => new StatisticItem({id: item.id})), 
+			stat: newDb.products.map(({id, title}) => new StatisticItem({id, title})), 
 			short: [
 				new ShortStatisticItem({volume: 0})
 			]
@@ -47,13 +46,24 @@ class Experiment {
 // Private
 	#generateOrders = () => {
 		const retailersIndex = getRandomArray(101, 100 + this.#retailersAmount, getRandomInt(1, this.#retailersAmount)); // генерируем точки которые будут совершать заказ
+		const products = this.#store.getProducts().map(({id, title, margin}) => ({id, title, margin}));
+		const testProducts = this.#db.products.map(({id, title}) => ({id, title, chance: 0}));
+
+		products.forEach(({id, margin}) => {
+			const i = id - 201;
+			const chanceCur = testProducts[i].chance;
+			const chanceCalc = 0.5 + (20 - margin) * 0.0125;
+			testProducts[i] = {
+				...testProducts[i],
+				chance: chanceCalc > chanceCur ? chanceCalc : chanceCur,
+			}
+		})
 		
-		const products = this.#store.getProducts().map(({id, margin}) => ({id, chance: 0.5 + (20 - margin) * 0.0125}));
 		retailersIndex.forEach(retailerId => {
-			products.forEach(({id,chance}) => {
+			testProducts.forEach(({id, title, chance}) => {
 				if(Math.random() <= chance) {
 					let amount = getRandomInt(this.#minOrder, this.#maxOrder);
-					this.#store.newOrder(new RetailerOrder({id: id, amount: amount, retailerId: retailerId}))
+					this.#store.newOrder(new RetailerOrder({id, title, amount, retailerId}))
 				}
 			})
 		})
@@ -69,7 +79,7 @@ class Experiment {
 		this.#store.newDay();
 		this.#currentDay = this.#currentDay + 1;
 
-		updateCounter(this.#currentDay, this.#days);	
+		updateCounter(this.#currentDay, this.#days);
 	}
 
 	makeOrders = () => {
@@ -97,6 +107,7 @@ class Experiment {
 			stat.forEach(item => {
 				const { 
 					id,
+					title,
 					orderAmount,
 					departuresAmount, 
 					lossesAmount, 
@@ -107,6 +118,7 @@ class Experiment {
 
 				this.#result.stat[item.id - 201] = {
 					id,
+					title,
 					orderAmount : orderAmount + item.orderAmount,
 					departuresAmount : departuresAmount + item.departuresAmount,
 					lossesAmount : lossesAmount + item.lossesAmount,

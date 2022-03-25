@@ -36,13 +36,19 @@ form.addEventListener('submit', (e) => {
 		minDispatchTime,
 		maxDispatchTime
 	});
+
+	setup.classList.add('hide');
 });
 
 getOrdersBtn.addEventListener('click', () => {
 	ex.makeOrders();
 })
 
-resultsBtn.addEventListener('click', () => {
+const endOfExperement = () => {
+
+
+	slider && slider.removeActions();
+
 	experiment.classList.add('hide');
 	results.classList.remove('hide');
 	
@@ -51,4 +57,35 @@ resultsBtn.addEventListener('click', () => {
 	
 	drawHistory(historyResult, ex.getResult())
 	drawHistory(historyByDay, ex.getHistory());
+
+	setup.classList.remove('hide');
+
+	slider = new Slider(
+		document.querySelector('.slider__container'),
+		document.querySelector('.slider__wrapper'),
+		document.querySelector('.next-slide-btn'),
+		document.querySelector('.prev-slide-btn'),
+	);
+}
+
+resultsBtn.addEventListener('click', endOfExperement);
+
+
+rebootBtn.addEventListener('click', () => {
+	experiment.classList.add('hide');
+	setup.classList.remove('hide');
+})
+
+
+toEndBtn.addEventListener('click', () => {
+	if(nextBtn.classList.contains('hide')) {
+		ex.makeOrders();
+	}
+
+	while(resultsBtn.classList.contains('hide')) {
+		ex.nextStep();
+		ex.makeOrders();
+	}
+
+	endOfExperement();
 })

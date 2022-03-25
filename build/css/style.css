@@ -67,20 +67,20 @@ h6 {
 }
 
 body {
-  padding: 10px;
   position: relative;
+  padding: 10px;
 }
 
 .flex {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-column-gap: 10px;
-     -moz-column-gap: 10px;
-          column-gap: 10px;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
+  -webkit-column-gap: 10px;
+     -moz-column-gap: 10px;
+          column-gap: 10px;
 }
 
 .flex_cc {
@@ -107,7 +107,7 @@ label {
   left: 0;
   right: 0;
   z-index: 10;
-  background-color: #18aaaa;
+  background-color: #e6e6e6;
   padding: 5px 0;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -196,7 +196,7 @@ h2 {
   height: -webkit-fit-content;
   height: -moz-fit-content;
   height: fit-content;
-  max-height: 210px;
+  max-height: 200px;
   overflow-y: scroll;
   position: relative;
   width: -webkit-max-content;
@@ -214,8 +214,8 @@ h2 {
 .table__top select,
 .table__item span,
 .table__item select {
-  width: 6.5vw;
-  padding: 5px;
+  width: 6.75vw;
+  padding: 4px;
   border-right: solid 1px black;
   border-bottom: solid 1px black;
 }
@@ -270,8 +270,8 @@ h2 {
 }
 
 .block {
-  padding: 10px;
-  margin: 10px;
+  padding: 7px;
+  margin: 5px;
   border-radius: 10px;
   border: solid 1px black;
   width: -webkit-fit-content;
@@ -372,4 +372,53 @@ h3 {
 
 .table_tr .table__line:last-child span:last-child {
   border-bottom: none;
+}
+
+.to-end {
+  position: absolute;
+  right: 30px;
+  top: 10px;
+}
+
+.reboot {
+  position: absolute;
+  left: 30px;
+  top: 10px;
+}
+
+.slider {
+  position: relative;
+}
+
+.slider__container {
+  overflow-x: hidden;
+  width: 1010px;
+  height: 270px;
+  position: relative;
+}
+
+.slider__wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+}
+
+.slider__btn {
+  position: absolute;
+  top: -37px;
+  right: 0;
+}
+
+.prev-slide-btn {
+  right: 100px;
+}
+
+.history__block {
+  width: 1000px;
 }
